@@ -16,7 +16,9 @@
     height: 4vh;
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     align-items: center;
+    gap: 10px;
     padding: 20px;
     background-color: #17252A;
 }
@@ -27,6 +29,16 @@
     font-weight: 500;
     margin: 0px;
     padding: 0px;
+}
+.header_date {
+    margin: 0px;
+    padding: 0px;
+    color: white;
+    font-size: 12px;
+    font-family: "Poppins";
+    font-weight: 500;
+    white-space: pre-line;
+    text-align: center;
 }
 
 /* AQI Line Chart */
@@ -84,7 +96,7 @@
     font-family: "Poppins";
     font-weight: 600;
 }
-.aqi_reading_date {
+.aqi_reading_subheader {
     margin: 0px;
     padding: 0px;
     color: #052F5F;

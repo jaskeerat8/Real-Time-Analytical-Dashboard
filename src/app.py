@@ -40,7 +40,8 @@ app.title = "AQI Measure"
 app.layout = html.Div(className="main_layout", children=[
     dcc.Interval(id="time_interval", interval=60000),
     html.Div(className="header", children=[
-        dmc.Text("AQI Measure", className="header_text")
+        dmc.Text("Chandigarh AQI", className="header_text"),
+        dmc.Text(className="header_date", id="header_date")
     ]),
     html.Div(className="aqi_line_chart_container", children=[
         html.Div(className="aqi_line_chart", children=dcc.Graph(id="aqi_line_chart", config={"displayModeBar": False})),
@@ -49,10 +50,10 @@ app.layout = html.Div(className="main_layout", children=[
                 html.Div(className="aqi_reading", children=[
                     html.P(className="aqi_reading_heading", children="Current AQI"),
                     html.P(className="aqi_reading_count_actual", id="aqi_reading_count_actual"),
-                    html.P(className="aqi_reading_date", id="aqi_reading_date")
+                    html.P(className="aqi_reading_subheader", children="(24 Hour Average)")
                 ]),
                 html.Div(className="aqi_reading", children=[
-                    html.P(className="aqi_reading_heading", children="Next Predicted"),
+                    html.P(className="aqi_reading_heading", children="Next Predicted AQI"),
                     html.P(className="aqi_reading_count_predicted", id="aqi_reading_count_predicted", children=10)
                 ])
             ]),
@@ -134,14 +135,16 @@ def update_aqi_line_chart(time_interval):
 
 # Updating AQI Measures
 @app.callback(
-    [Output("aqi_reading_date", "children"), Output("aqi_reading_count_actual", "children"), Output("PM25_gauge", "value"), Output("PM10_gauge", "value"), Output("so2_gauge", "value"), Output("co_gauge", "value"), Output("o3_gauge", "value"), Output("no2_gauge", "value")],
+    [Output("header_date", "children"), Output("aqi_reading_count_actual", "children"), Output("PM25_gauge", "value"), Output("PM10_gauge", "value"), Output("so2_gauge", "value"), Output("co_gauge", "value"), Output("o3_gauge", "value"), Output("no2_gauge", "value")],
     Input("time_interval", "n_intervals")
 )
 def update_aqi_measures(time_interval):
     df = get_data()
+    aqi_us_count = statistics.mean(df["aqi_us_count"])
+    aqi_in_count = statistics.mean(df["aqi_in_count"])
+    aqi = round(statistics.mean([aqi_us_count, aqi_in_count]))
     measures = df.iloc[0]
-    time_received = measures["time_received"].strftime("%d %B %Y, %I:%M %p")
-    aqi = statistics.mean([measures["aqi_us_count"], measures["aqi_in_count"]])
+    time_received = "Last Update:\n" + measures["time_received"].strftime("%d %B %Y, %I:%M %p")
     return time_received, aqi, measures["pm25"], measures["pm10"], measures["so2"], measures["co"], measures["o3"], measures["no2"]
 
 
