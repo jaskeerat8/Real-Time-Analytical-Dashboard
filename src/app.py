@@ -5,11 +5,18 @@ import boto3
 import statistics
 import pandas as pd
 from sqlalchemy import create_engine
+import pytz
+from datetime import datetime, timedelta
 import dash_daq as daq
 import plotly.express as px
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 from dash import Dash, html, dcc, Input, Output
+import pickle
+
+# Loading ML Model
+with open("model.pkl", "rb") as f:
+    model = pickle.load(f)
 
 def get_data():
     # Setting up Boto3 Client
@@ -39,6 +46,7 @@ server = app.server
 app.title = "AQI Measure"
 app.layout = html.Div(className="main_layout", children=[
     dcc.Interval(id="time_interval", interval=60000),
+    dcc.Interval(id="model_time_interval", interval=1800000),
     html.Div(className="header", children=[
         dmc.Text("Chandigarh AQI", className="header_text"),
         dmc.Text(className="header_date", id="header_date")
@@ -54,7 +62,8 @@ app.layout = html.Div(className="main_layout", children=[
                 ]),
                 html.Div(className="aqi_reading", children=[
                     html.P(className="aqi_reading_heading", children="Next ML Predicted AQI"),
-                    html.P(className="aqi_reading_count_predicted", id="aqi_reading_count_predicted", children=120)
+                    html.P(className="aqi_reading_count_predicted", id="aqi_reading_count_predicted"),
+                    html.P(className="aqi_reading_subheader", children="(Per Hour)")
                 ])
             ]),
             html.Div(className="aqi_line_chart_legend", children=[
@@ -146,6 +155,17 @@ def update_aqi_measures(time_interval):
     measures = df.iloc[0]
     time_received = "Last Update:\n" + measures["time_received"].strftime("%d %B %Y, %I:%M %p")
     return time_received, aqi, measures["pm25"], measures["pm10"], measures["so2"], measures["co"]/100, measures["o3"], measures["no2"]
+
+# Updating AQI Predicted Value
+@app.callback(
+    Output("aqi_reading_count_predicted", "children"),
+    Input("model_time_interval", "n_intervals")
+)
+def update_aqi_predicted_count(time_interval):
+    upcoming_hour = (datetime.now().astimezone(pytz.timezone("Asia/Kolkata"))+timedelta(hours=1)).hour
+    aqi = model.predict(pd.DataFrame({"Hour": [upcoming_hour]}))[0]
+    aqi = round(aqi)
+    return aqi
 
 
 # Running Main App

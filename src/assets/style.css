@@ -107,9 +107,9 @@
 .aqi_reading_count_predicted {
     margin: 0px;
     padding: 0px;
-    line-height: 50px;
+    line-height: 40px;
     color: #052F5F;
-    font-size: 45px;
+    font-size: 40px;
     font-family: "Poppins";
     font-weight: 600;
 }
