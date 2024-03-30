@@ -53,56 +53,56 @@ app.layout = html.Div(className="main_layout", children=[
                     html.P(className="aqi_reading_subheader", children="(24 Hour Average)")
                 ]),
                 html.Div(className="aqi_reading", children=[
-                    html.P(className="aqi_reading_heading", children="Next Predicted AQI"),
-                    html.P(className="aqi_reading_count_predicted", id="aqi_reading_count_predicted", children=10)
+                    html.P(className="aqi_reading_heading", children="Next ML Predicted AQI"),
+                    html.P(className="aqi_reading_count_predicted", id="aqi_reading_count_predicted", children=120)
                 ])
             ]),
             html.Div(className="aqi_line_chart_legend", children=[
                 html.Div(className="aqi_line_chart_legend_header", children="Air Quality"),
-                html.Div(className="aqi_line_chart_legend_item", children="Good (0-50)", style={"background-color": "#85ba7d"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Satisfactory (51-100)", style={"background-color": "#fade5a"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Moderate (101-200)", style={"background-color": "#f17935"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Poor (201-300)", style={"background-color": "#d93739"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Very Poor (301-400)", style={"background-color": "#85317e"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Severe (401-500)", style={"background-color": "#401523"})
+                html.Div(className="aqi_line_chart_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
+                html.Div(className="aqi_line_chart_legend_item", children="Satisfactory (51-100)", style={"background-color": "#9ACD32"}),
+                html.Div(className="aqi_line_chart_legend_item", children="Moderate (101-200)", style={"background-color": "#FFC300"}),
+                html.Div(className="aqi_line_chart_legend_item", children="Poor (201-300)", style={"background-color": "#F58F09"}),
+                html.Div(className="aqi_line_chart_legend_item", children="Very Poor (301-400)", style={"background-color": "#C41206"}),
+                html.Div(className="aqi_line_chart_legend_item", children="Severe (401-500)", style={"background-color": "#810100"})
             ])
         ])
     ]),
     html.Div(className="aqi_measure_row", children=[
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud", color="black", width=25), html.P("PM2.5")]),
-            daq.Gauge(className="aqi_measure_gauge", id="PM25_gauge", showCurrentValue=True, value=0, size=170, min=0, max=500,
-                color={"gradient": True, "ranges": {"#85ba7d": [0, 30], "#fade5a": [30, 60], "#f17935":[60, 90], "#d93739": [90, 120], "#85317e":[120, 250], "#401523": [250, 500]}}
+            daq.Gauge(className="aqi_measure_gauge", id="PM25_gauge", showCurrentValue=True, value=0, size=170, min=0, max=380, units="ug/m^3",
+                color={"gradient": True, "ranges": {"#377A07": [0, 30], "#9ACD32": [30, 60], "#FFC300":[60, 90], "#F58F09": [90, 120], "#C41206":[120, 250], "#810100": [250, 380]}}
             )
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud-solid", color="black", width=25), html.P("PM10")]),
-            daq.Gauge(className="aqi_measure_gauge", id="PM10_gauge", showCurrentValue=True, value=0, size=170, min=0, max=500,
-                color={"gradient": True, "ranges": {"#85ba7d": [0, 50], "#fade5a": [50, 100], "#f17935":[100, 250], "#d93739": [250, 350], "#85317e":[350, 430], "#401523": [430, 500]}}
+            daq.Gauge(className="aqi_measure_gauge", id="PM10_gauge", showCurrentValue=True, value=0, size=170, min=0, max=700, units="ug/m^3",
+                color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 250], "#F58F09": [250, 350], "#C41206":[350, 430], "#810100": [430, 700]}}
             )
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Sulfur_Dioxide.png", alt="so2", width="30%"), html.P("Sulfur Dioxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=2400,
-                color={"gradient": True, "ranges": {"#85ba7d": [0, 40], "#fade5a": [40, 80], "#f17935":[80, 380], "#d93739": [380, 800], "#85317e":[800, 1600], "#401523": [1600, 2400]}}
+            daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=2000, units="ug/m^3",
+                color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 380], "#F58F09": [380, 800], "#C41206":[800, 1600], "#810100": [1600, 2000]}}
             )
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Carbon_Monoxide.png", alt="co", width="30%"), html.P("Carbon Monoxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, size=170, min=0, max=500,
-                color={"gradient": True, "ranges": {"#85ba7d": [0, 1], "#fade5a": [1, 2], "#f17935":[2, 10], "#d93739": [10, 17], "#85317e":[17, 34], "#401523": [34, 500]}}
+            daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, size=170, min=0, max=50, units="ug/m^3",
+                color={"gradient": True, "ranges": {"#377A07": [0, 5], "#9ACD32": [5, 10], "#FFC300":[10, 13], "#F58F09": [13, 16], "#C41206":[16, 31], "#810100": [31, 50]}}
             )
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/ozone.png", alt="o3", width="15%"), html.P("Ozone")]),
-            daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, value=0, size=170, min=0, max=1500,
-                color={"gradient": True, "ranges": {"#85ba7d": [0, 50], "#fade5a": [50, 100], "#f17935":[100, 168], "#d93739": [168, 208], "#85317e":[208, 748], "#401523": [748, 1500]}}
+            daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, value=0, size=170, min=0, max=450, units="ug/m^3",
+                color={"gradient": True, "ranges": {"#377A07": [0, 26], "#9ACD32": [26, 51], "#FFC300":[51, 87], "#F58F09": [87, 107], "#C41206":[107, 382], "#810100": [382, 450]}}
             )
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Nitrogen_Dioxide.png", alt="no2", width="30%"), html.P("Nitrogen Dioxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=600,
-                color={"gradient": True, "ranges": {"#85ba7d": [0, 40], "#fade5a": [40, 80], "#f17935":[80, 180], "#d93739": [180, 280], "#85317e":[280, 400], "#401523": [400, 600]}}
+            daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=750, units="ug/m^3",
+                color={"gradient": True, "ranges": {"#377A07": [0, 22], "#9ACD32": [22, 44], "#FFC300":[44, 97], "#F58F09": [97, 150], "#C41206":[150, 214], "#810100": [214, 750]}}
             )
         ])
     ])
@@ -145,7 +145,7 @@ def update_aqi_measures(time_interval):
     aqi = round(statistics.mean([aqi_us_count, aqi_in_count]))
     measures = df.iloc[0]
     time_received = "Last Update:\n" + measures["time_received"].strftime("%d %B %Y, %I:%M %p")
-    return time_received, aqi, measures["pm25"], measures["pm10"], measures["so2"], measures["co"], measures["o3"], measures["no2"]
+    return time_received, aqi, measures["pm25"], measures["pm10"], measures["so2"], measures["co"]/100, measures["o3"], measures["no2"]
 
 
 # Running Main App
