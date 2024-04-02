@@ -96,25 +96,25 @@ app.layout = html.Div(className="main_layout", children=[
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Sulfur_Dioxide.png", alt="so2", width="30%"), html.P("Sulfur Dioxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=2000, units="ug/m^3",
+            daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=2000, units="ppm",
                 color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 380], "#F58F09": [380, 800], "#C41206":[800, 1600], "#810100": [1600, 2000]}}
             )
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Carbon_Monoxide.png", alt="co", width="30%"), html.P("Carbon Monoxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, size=170, min=0, max=50, units="ug/m^3",
-                color={"gradient": True, "ranges": {"#377A07": [0, 5], "#9ACD32": [5, 10], "#FFC300":[10, 13], "#F58F09": [13, 16], "#C41206":[16, 31], "#810100": [31, 50]}}
+            daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, size=170, min=0, max=500, units="ug/m^3",
+                color={"gradient": True, "ranges": {"#377A07": [0, 5], "#9ACD32": [5, 10], "#FFC300":[10, 13], "#F58F09": [13, 16], "#C41206":[16, 31], "#810100": [31, 500]}}
             )
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/ozone.png", alt="o3", width="15%"), html.P("Ozone")]),
-            daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, value=0, size=170, min=0, max=450, units="ug/m^3",
+            daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, value=0, size=170, min=0, max=450, units="ppm",
                 color={"gradient": True, "ranges": {"#377A07": [0, 26], "#9ACD32": [26, 51], "#FFC300":[51, 87], "#F58F09": [87, 107], "#C41206":[107, 382], "#810100": [382, 450]}}
             )
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Nitrogen_Dioxide.png", alt="no2", width="30%"), html.P("Nitrogen Dioxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=750, units="ug/m^3",
+            daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=750, units="ppm",
                 color={"gradient": True, "ranges": {"#377A07": [0, 22], "#9ACD32": [22, 44], "#FFC300":[44, 97], "#F58F09": [97, 150], "#C41206":[150, 214], "#810100": [214, 750]}}
             )
         ])
@@ -177,7 +177,7 @@ def update_aqi_measures(time_interval):
     else:
         uv = str(uv) + " (Low)"
 
-    return time_received, aqi, measures["pm25"], measures["pm10"], measures["so2"], measures["co"]/100, measures["o3"], measures["no2"], temperature, humidity, uv, wind
+    return time_received, aqi, measures["pm25"], measures["pm10"], measures["so2"], measures["co"], measures["o3"], measures["no2"], temperature, humidity, uv, wind
 
 # Updating AQI Predicted Value
 @app.callback(
