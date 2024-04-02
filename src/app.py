@@ -49,6 +49,10 @@ app.layout = html.Div(className="main_layout", children=[
     dcc.Interval(id="model_time_interval", interval=1800000),
     html.Div(className="header", children=[
         dmc.Text("Chandigarh AQI", className="header_text"),
+        html.Div(className="header_measure", children=[DashIconify(icon="fluent:temperature-16-filled", color="white", width=25), html.P(id="header_temperature")]),
+        html.Div(className="header_measure", children=[DashIconify(icon="carbon:humidity", color="white", width=25), html.P(id="header_humidity")]),
+        html.Div(className="header_measure", children=[DashIconify(icon="tabler:uv-index", color="white", width=25), html.P(id="header_uv")]),
+        html.Div(className="header_measure", children=[DashIconify(icon="mi:wind", color="white", width=25), html.P(id="header_wind")]),
         dmc.Text(className="header_date", id="header_date")
     ]),
     html.Div(className="aqi_line_chart_container", children=[
@@ -144,7 +148,9 @@ def update_aqi_line_chart(time_interval):
 
 # Updating AQI Measures
 @app.callback(
-    [Output("header_date", "children"), Output("aqi_reading_count_actual", "children"), Output("PM25_gauge", "value"), Output("PM10_gauge", "value"), Output("so2_gauge", "value"), Output("co_gauge", "value"), Output("o3_gauge", "value"), Output("no2_gauge", "value")],
+    [Output("header_date", "children"), Output("aqi_reading_count_actual", "children"), Output("PM25_gauge", "value"), Output("PM10_gauge", "value"),
+     Output("so2_gauge", "value"), Output("co_gauge", "value"), Output("o3_gauge", "value"), Output("no2_gauge", "value"),
+     Output("header_temperature", "children"), Output("header_humidity", "children"), Output("header_uv", "children"), Output("header_wind", "children")],
     Input("time_interval", "n_intervals")
 )
 def update_aqi_measures(time_interval):
@@ -152,9 +158,26 @@ def update_aqi_measures(time_interval):
     aqi_us_count = statistics.mean(df["aqi_us_count"])
     aqi_in_count = statistics.mean(df["aqi_in_count"])
     aqi = round(statistics.mean([aqi_us_count, aqi_in_count]))
+
     measures = df.iloc[0]
     time_received = "Last Update:\n" + measures["time_received"].strftime("%d %B %Y, %I:%M %p")
-    return time_received, aqi, measures["pm25"], measures["pm10"], measures["so2"], measures["co"]/100, measures["o3"], measures["no2"]
+    temperature = str(measures["temperature"]) + " °C"
+    humidity = str(measures["humidity"]) + "%"
+    wind = str(measures["wind"]) + " km/hr"
+
+    uv = measures["uv"]
+    if(uv > 11):
+        uv = str(uv) + " (Extreme)"
+    elif(uv > 8):
+        uv = str(uv) + " (Very High)"
+    elif(uv > 6):
+        uv = str(uv) + " (High)"
+    elif(uv > 3):
+        uv = str(uv) + " (Moderate)"
+    else:
+        uv = str(uv) + " (Low)"
+
+    return time_received, aqi, measures["pm25"], measures["pm10"], measures["so2"], measures["co"]/100, measures["o3"], measures["no2"], temperature, humidity, uv, wind
 
 # Updating AQI Predicted Value
 @app.callback(
