@@ -71,13 +71,13 @@ def lambda_handler(event, context):
     pm25, pm10, so2, co, o3, no2 = [int(value.text) for value in soup.find_all(class_="Pollutants_sensor_text")]
     
     #Weather Data API
-    url = f"""https://api.tomorrow.io/v4/weather/realtime?location=chandigarh&apikey={os.environ.get("weather_api_key")}"""
+    url = f"""http://api.weatherapi.com/v1/current.json?key={os.environ.get("weather_api_key")}&q=Chandigarh&aqi=no"""
     response = requests.get(url, headers={"accept": "application/json"})
     weather_data = response.json()
-    temperature = math.ceil(weather_data["data"]["values"]["temperatureApparent"])
-    humidity = math.ceil(weather_data["data"]["values"]["humidity"])
-    uv = weather_data["data"]["values"]["uvIndex"]
-    wind = math.ceil(weather_data["data"]["values"]["windGust"] * 1.60934)
+    temperature = round(weather_data["current"]["temp_c"])
+    humidity = round(weather_data["current"]["humidity"])
+    uv = round(weather_data["current"]["uv"])
+    wind = round(weather_data["current"]["wind_kph"])
     
     #Post Data to MySQL
     post_data(value, time_received, aqi_us_count, aqi_in_count, pm25, pm10, so2, co, o3, no2, temperature, humidity, uv, wind)
