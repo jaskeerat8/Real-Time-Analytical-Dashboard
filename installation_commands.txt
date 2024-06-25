@@ -1,0 +1,49 @@
+ls
+mkdir aqi chatstat
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install software-properties-common
+
+sudo apt-get install mysql-server -y
+sudo mysql -u root -p
+
+sudo apt-get install git -y
+git clone https://<>.git
+
+sudo apt-get install python3 -y
+sudo apt-get install python3-pip -y
+sudo apt-get install python3-virtualenv -y
+
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt install python3.9
+python3.9 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+sudo apt-get install python3-mysql.connector
+
+curl -o style.css https://github.com/jaskeerat8/Real-Time-Analytical-Dashboard/blob/84c5efe34c32010c6f7080e4fc116347c2afde68/src/assets/style.css
+
+
+sudo mv aqi.csv /var/lib/mysql-files/
+LOAD DATA INFILE '/var/lib/mysql-files/aqi.csv'
+INTO TABLE aqi_measures
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+echo 'export weather_api_key="61a52d25f84241808d193256242006"' >> ~/.bashrc
+echo 'export db_host="127.0.0.1"' >> ~/.bashrc
+echo 'export db_port=3306' >> ~/.bashrc
+echo 'export db_database="dashboard"' >> ~/.bashrc
+echo 'export db_user="root"' >> ~/.bashrc
+echo 'export db_password=""' >> ~/.bashrc
+source ~/.bashrc
+
+
+crontab -e
+*/1 * * * * /home/ubuntu/aqi/venv/bin/python /home/ubuntu/aqi/data_scrapping.py >> /home/ubuntu/aqi/cron.log 2>&1
+
+nohup gunicorn -w 1 -b 0.0.0.0:8000 app:server &
+nohup gunicorn -w 1 -b 0.0.0.0:8001 app:server &
