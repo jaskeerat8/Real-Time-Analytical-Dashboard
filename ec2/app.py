@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 import dash_daq as daq
 import plotly.express as px
 import dash_mantine_components as dmc
-from dash_mantine_components import MantineProvider
 from dash_iconify import DashIconify
 from dash import Dash, html, dcc, Input, Output
 import pickle
@@ -36,17 +35,17 @@ def get_data():
 app = Dash(__name__, external_stylesheets=["https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"])
 server = app.server
 app.title = "AQI Measure"
-app.layout = MantineProvider(html.Div(className="main_layout", children=[
+app.layout = html.Div(className="main_layout", children=[
     dcc.Interval(id="time_interval", interval=60000),
     dcc.Interval(id="model_time_interval", interval=1800000),
     html.Div(className="header", children=[
-        html.P("Chandigarh AQI", className="header_text"),
+        dmc.Text("Chandigarh AQI", className="header_text"),
         html.Div(className="header_measure", children=[DashIconify(icon="fluent:temperature-16-filled", color="white", width=25), html.P(id="header_temperature")]),
         html.Div(className="header_measure", children=[DashIconify(icon="carbon:humidity", color="white", width=25), html.P(id="header_humidity")]),
         html.Div(className="header_measure", children=[DashIconify(icon="tabler:uv-index", color="white", width=25), html.P(id="header_uv")]),
         html.Div(className="header_measure", children=[DashIconify(icon="mi:wind", color="white", width=25), html.P(id="header_wind")]),
-        html.P(className="header_date", id="header_date")
-        ]),
+        dmc.Text(className="header_date", id="header_date")
+    ]),
     html.Div(className="aqi_line_chart_container", children=[
         html.Div(className="aqi_line_chart", children=dcc.Graph(id="aqi_line_chart", config={"displayModeBar": False})),
         html.Div(className="aqi_info", children=[
@@ -55,13 +54,13 @@ app.layout = MantineProvider(html.Div(className="main_layout", children=[
                     html.P(className="aqi_reading_heading", children="Current AQI"),
                     html.P(className="aqi_reading_count_actual", id="aqi_reading_count_actual"),
                     html.P(className="aqi_reading_subheader", children="(24 Hour Average)")
-                    ]),
+                ]),
                 html.Div(className="aqi_reading", children=[
                     html.P(className="aqi_reading_heading", children="Next ML Predicted AQI"),
                     html.P(className="aqi_reading_count_predicted", id="aqi_reading_count_predicted"),
-                    html.P(className="aqi_reading_subheader", children="(Per Hour)")                                                                                                                                                                              1,1           Top
-                    ])
-                ]),
+                    html.P(className="aqi_reading_subheader", children="(Per Hour)")
+                ])
+            ]),
             html.Div(className="aqi_line_chart_legend", children=[
                 html.Div(className="aqi_line_chart_legend_header", children="Air Quality"),
                 html.Div(className="aqi_line_chart_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
@@ -70,49 +69,49 @@ app.layout = MantineProvider(html.Div(className="main_layout", children=[
                 html.Div(className="aqi_line_chart_legend_item", children="Poor (201-300)", style={"background-color": "#F58F09"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Very Poor (301-400)", style={"background-color": "#C41206"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Severe (401-500)", style={"background-color": "#810100"})
-                ])
             ])
-        ]),
+        ])
+    ]),
     html.Div(className="aqi_measure_row", children=[
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud", color="black", width=25), html.P("PM2.5")]),
             daq.Gauge(className="aqi_measure_gauge", id="PM25_gauge", showCurrentValue=True, value=0, size=170, min=0, max=380, units="ug/m^3",
-                      color={"gradient": True, "ranges": {"#377A07": [0, 30], "#9ACD32": [30, 60], "#FFC300":[60, 90], "#F58F09": [90, 120], "#C41206":[120, 250], "#810100": [250, 380]}}
-                      )
-            ]),
+                color={"gradient": True, "ranges": {"#377A07": [0, 30], "#9ACD32": [30, 60], "#FFC300":[60, 90], "#F58F09": [90, 120], "#C41206":[120, 250], "#810100": [250, 380]}}
+            )
+        ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud-solid", color="black", width=25), html.P("PM10")]),
             daq.Gauge(className="aqi_measure_gauge", id="PM10_gauge", showCurrentValue=True, value=0, size=170, min=0, max=700, units="ug/m^3",
-                      color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 250], "#F58F09": [250, 350], "#C41206":[350, 430], "#810100": [430, 700]}}
-                      )
-            ]),
+                color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 250], "#F58F09": [250, 350], "#C41206":[350, 430], "#810100": [430, 700]}}
+            )
+        ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Sulfur_Dioxide.png", alt="so2", width="30%"), html.P("Sulfur Dioxide")]),
             daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=2000, units="ppm",
-                      color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 380], "#F58F09": [380, 800], "#C41206":[800, 1600], "#810100": [1600, 2000]}}
-                      )
-            ]),
+                color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 380], "#F58F09": [380, 800], "#C41206":[800, 1600], "#810100": [1600, 2000]}}
+            )
+        ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Carbon_Monoxide.png", alt="co", width="30%"), html.P("Carbon Monoxide")]),
             daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, size=170, min=0, max=500, units="ug/m^3",
-                      color={"gradient": True, "ranges": {"#377A07": [0, 5], "#9ACD32": [5, 10], "#FFC300":[10, 13], "#F58F09": [13, 16], "#C41206":[16, 31], "#810100": [31, 500]}}
-                      )
-            ]),
+                color={"gradient": True, "ranges": {"#377A07": [0, 5], "#9ACD32": [5, 10], "#FFC300":[10, 13], "#F58F09": [13, 16], "#C41206":[16, 31], "#810100": [31, 500]}}
+            )
+        ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/ozone.png", alt="o3", width="15%"), html.P("Ozone")]),
             daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, value=0, size=170, min=0, max=450, units="ppm",
-                      color={"gradient": True, "ranges": {"#377A07": [0, 26], "#9ACD32": [26, 51], "#FFC300":[51, 87], "#F58F09": [87, 107], "#C41206":[107, 382], "#810100": [382, 450]}}
-                      )
-            ]),
+                color={"gradient": True, "ranges": {"#377A07": [0, 26], "#9ACD32": [26, 51], "#FFC300":[51, 87], "#F58F09": [87, 107], "#C41206":[107, 382], "#810100": [382, 450]}}
+            )
+        ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Nitrogen_Dioxide.png", alt="no2", width="30%"), html.P("Nitrogen Dioxide")]),
             daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=750, units="ppm",
-                      color={"gradient": True, "ranges": {"#377A07": [0, 22], "#9ACD32": [22, 44], "#FFC300":[44, 97], "#F58F09": [97, 150], "#C41206":[150, 214], "#810100": [214, 750]}}
-                      )
-            ])
+                color={"gradient": True, "ranges": {"#377A07": [0, 22], "#9ACD32": [22, 44], "#FFC300":[44, 97], "#F58F09": [97, 150], "#C41206":[150, 214], "#810100": [214, 750]}}
+            )
         ])
+    ])
 ])
-)
+
 
 # Updating AQI Line Chart
 @app.callback(
