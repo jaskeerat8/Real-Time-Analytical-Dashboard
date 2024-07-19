@@ -183,4 +183,4 @@ def update_aqi_predicted_count(time_interval):
 
 # Running Main App
 if __name__ == "__main__":
-    app.run_server(debug=False, host="0.0.0.0", port=8000)
+    app.run_server(debug=False, host="0.0.0.0", port=8004)
