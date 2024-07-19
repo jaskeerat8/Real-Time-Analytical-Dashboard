@@ -41,5 +41,5 @@ server {
 }
 
 
-Sudo nginx -t
+sudo nginx -t
 sudo systemctl reload nginx
