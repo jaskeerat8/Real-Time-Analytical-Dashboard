@@ -1,7 +1,6 @@
 # Importing Libraries
 import os
 import json
-import boto3
 import statistics
 import pandas as pd
 from sqlalchemy import create_engine
@@ -160,7 +159,7 @@ def update_aqi_measures(time_interval):
     aqi = round(statistics.mean([aqi_us_count, aqi_in_count]))
 
     measures = df.iloc[0]
-    time_received = "Last Update:\n" + measures["time_received"].strftime("%d %B %Y, %I:%M %p")
+    time_received = "Last Update (IST):\n" + measures["time_received"].strftime("%d %B %Y, %I:%M %p")
     temperature = str(measures["temperature"]) + " °C"
     humidity = str(measures["humidity"]) + "%"
     wind = str(measures["wind"]) + " km/hr"
