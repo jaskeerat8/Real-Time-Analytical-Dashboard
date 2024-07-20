@@ -11,6 +11,11 @@ User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/aqi
 Environment="PATH=/home/ubuntu/aqi/venv/bin"
+Environment="db_host=127.0.0.1"
+Environment="db_port=3306"
+Environment="db_database=dashboard"
+Environment="db_user=root"
+Environment="db_password="
 ExecStart=/home/ubuntu/aqi/venv/bin/gunicorn --workers 1 --bind 0.0.0.0:8000 app:server
 
 [Install]
