@@ -11,7 +11,7 @@ User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/aqi
 Environment="PATH=/home/ubuntu/aqi/venv/bin"
-ExecStart=/home/ubuntu/aqi/venv/bin/gunicorn --workers 1 --bind 0.0.0.0:8004 app:server
+ExecStart=/home/ubuntu/aqi/venv/bin/gunicorn --workers 1 --bind 0.0.0.0:8000 app:server
 
 [Install]
 WantedBy=multi-user.target
@@ -32,12 +32,37 @@ server {
     listen 80;
 
     location /aqi {
-        proxy_pass http://127.0.0.1:8004;
+        proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+
+    location /chatstat {
+        proxy_pass http://127.0.0.1:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /rentsupport {
+        proxy_pass http://127.0.0.1:8002;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+   location /rentwithheart {
+        proxy_pass http://127.0.0.1:8003;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
 }
 
 
