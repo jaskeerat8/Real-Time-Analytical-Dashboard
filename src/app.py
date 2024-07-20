@@ -1,6 +1,7 @@
 # Importing Libraries
 import os
 import json
+import boto3
 import statistics
 import pandas as pd
 from sqlalchemy import create_engine
