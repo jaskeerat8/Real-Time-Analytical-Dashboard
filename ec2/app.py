@@ -56,8 +56,8 @@ app.layout = html.Div(className="main_layout", children=[
                 ])
             ]),
             html.Div(className="aqi_line_chart_legend", children=[
-                html.Div(className="aqi_line_chart_legend_header", children="Air Quality"),
-                html.Div(className="aqi_line_chart_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
+                html.Div(className="_legend_header", children="Air Quality"),
+                html.Div(className="_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Satisfactory (51-100)", style={"background-color": "#9ACD32"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Moderate (101-200)", style={"background-color": "#FFC300"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Poor (201-300)", style={"background-color": "#F58F09"}),
@@ -124,7 +124,7 @@ def update_aqi_line_chart(time_interval):
     aqi_chart.update_layout(xaxis_showgrid=False, xaxis=dict(tickfont=dict(size=12, family="Poppins", color="#000000"), tickangle=0))
     aqi_chart.update_traces(mode="lines+markers", line=dict(width=2), marker=dict(sizemode="diameter", size=8, color="white", line=dict(width=2.5)))
     aqi_chart.update_yaxes(fixedrange=True)
-    aqi_chart.update_xaxes(tickformat="%d %B %Y\n%I:%M%p")
+    aqi_chart.update_xaxes(tickformat="%d %b %Y\n%I:%M%p")
 
     # Hover Label
     aqi_chart.update_layout(hovermode="x unified", hoverlabel=dict(bgcolor="#c1dfff", font_size=12, font_family="Poppins", align="left"))
