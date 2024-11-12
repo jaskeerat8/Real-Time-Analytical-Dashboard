@@ -1,6 +1,5 @@
 # Importing Libraries
 import os
-import json
 import statistics
 import pandas as pd
 from sqlalchemy import create_engine
@@ -11,11 +10,7 @@ import plotly.express as px
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 from dash import Dash, html, dcc, Input, Output
-import pickle
-
-# Loading ML Model
-# with open("model.pkl", "rb") as f:
-#     model = pickle.load(f)
+from sklearn.linear_model import LinearRegression
 
 def get_data():
     mysql_host = os.getenv("db_host")
@@ -175,11 +170,24 @@ def update_aqi_measures(time_interval):
         Input("model_time_interval", "n_intervals")
   )
 def update_aqi_predicted_count(time_interval):
-    upcoming_hour = (datetime.now().astimezone(pytz.timezone("Asia/Kolkata"))+timedelta(hours=1)).hour
-    # aqi = model.predict(pd.DataFrame({"Hour": [upcoming_hour]}))[0]
-    # aqi = round(aqi)
-    # return aqi
-    return 100
+    df = get_data()
+    df["time_received"] = pd.to_datetime(df["time_received"])
+    df["month"] = df["time_received"].dt.month
+    df["day"] = df["time_received"].dt.day
+    df["hour"] = df["time_received"].dt.hour
+
+    model = LinearRegression()
+    model.fit(df[["month", "day", "hour", "pm25", "pm10", "so2", "co", "o3", "no2"]], df["aqi"])
+
+    now = datetime.now().astimezone(pytz.timezone("Asia/Kolkata"))
+    data = {"month": [now.month], "day": [now.day], "hour": [(now + timedelta(hours=1)).hour], "pm25": [df["pm25"].iloc[-1]],
+            "pm10": [df["pm10"].iloc[-1]], "so2": [df["so2"].iloc[-1]], "co": [df["co"].iloc[-1]], "o3": [df["o3"].iloc[-1]], "no2": [df["no2"].iloc[-1]]
+    }
+    prediction_df = pd.DataFrame(data)
+
+    predicted_aqi = model.predict(prediction_df)[0]
+    predicted_aqi = round(predicted_aqi)
+    return predicted_aqi
 
 # Running Main App
 if __name__ == "__main__":
