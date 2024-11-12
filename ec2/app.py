@@ -171,6 +171,7 @@ def update_aqi_measures(time_interval):
   )
 def update_aqi_predicted_count(time_interval):
     df = get_data()
+    df["aqi"] = (df["aqi_us_count"] + df["aqi_in_count"]) / 2
     df["time_received"] = pd.to_datetime(df["time_received"])
     df["month"] = df["time_received"].dt.month
     df["day"] = df["time_received"].dt.day
