@@ -124,7 +124,7 @@ def update_aqi_line_chart(time_interval):
     aqi_chart.update_layout(xaxis_showgrid=False, xaxis=dict(tickfont=dict(size=12, family="Poppins", color="#000000"), tickangle=0))
     aqi_chart.update_traces(mode="lines+markers", line=dict(width=2), marker=dict(sizemode="diameter", size=8, color="white", line=dict(width=2.5)))
     aqi_chart.update_yaxes(fixedrange=True)
-    aqi_chart.update_xaxes(tickformat="%d %b %Y\n%I:%M%p")
+    aqi_chart.update_xaxes(tickformat="%d %b %Y \n%I:%M%p")
 
     # Hover Label
     aqi_chart.update_layout(hovermode="x unified", hoverlabel=dict(bgcolor="#c1dfff", font_size=12, font_family="Poppins", align="left"))
