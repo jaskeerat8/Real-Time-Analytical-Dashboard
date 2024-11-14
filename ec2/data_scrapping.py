@@ -3,7 +3,7 @@ import os
 import requests
 import mysql.connector
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Inserting Data into MySQL
 def post_data(time_received, aqi_us_count, aqi_in_count, pm25, pm10, so2, co, o3, no2, temperature, humidity, uv, wind):
@@ -47,16 +47,20 @@ def post_data(time_received, aqi_us_count, aqi_in_count, pm25, pm10, so2, co, o3
 # Main Function
 def data_scraping():
     #Scraping Data
-    url = "https://www.aqi.in/au/dashboard/india/chandigarh"
-    response = requests.get(url)
-    html_content = response.text
-    soup = BeautifulSoup(html_content, "html.parser")
-    time_received = soup.find(class_="card-location-time").text.split(":", 1)[-1].strip()
-    time_received = datetime.strptime(time_received, "%d %b %Y, %I:%M%p")
+    url = "https://www.iqair.com/au/india/chandigarh"
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.content, "html.parser")
+    time_received = soup.find("time")["datetime"]
+    time_received = datetime.strptime(time_received, "%Y-%m-%dT%H:%M:%S.%fZ") + timedelta(hours=5, minutes=30)
+    aqi_pollutant_table = soup.find(class_="aqi-overview-detail__other-pollution-table")
+    pm25, pm10, o3, no2, so2, co = [int(float(value.text)) for value in aqi_pollutant_table.find_all(class_="pollutant-concentration-value")]
+    aqi_us_count = int(soup.find(class_="aqi-value__value").text)
 
-    aqi_us_count = int(soup.find_all(class_="AQI_toggle aqiUsa")[-1].text)
-    aqi_in_count = int(soup.find_all(class_="AQI_toggle aqiInd")[-1].text)
-    pm25, pm10, so2, co, o3, no2 = [int(value.text) for value in soup.find_all(class_="Pollutants_sensor_text")]
+    url = "https://aqicn.org/city/india/chandigarh/sector-25/"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, "html.parser")
+    aqi_in_count = int(soup.find(class_="aqivalue").text)
 
     #Weather Data API
     url = f"""http://api.weatherapi.com/v1/current.json?key={os.getenv('weather_api_key')}&q=Chandigarh&aqi=no"""
