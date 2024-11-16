@@ -61,8 +61,8 @@ app.layout = html.Div(className="main_layout", children=[
                 ])
             ]),
             html.Div(className="aqi_line_chart_legend", children=[
-                html.Div(className="_legend_header", children="Air Quality"),
-                html.Div(className="_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
+                html.Div(className="aqi_line_chart_legend_item", children="Air Quality"),
+                html.Div(className="aqi_line_chart_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Satisfactory (51-100)", style={"background-color": "#9ACD32"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Moderate (101-200)", style={"background-color": "#FFC300"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Poor (201-300)", style={"background-color": "#F58F09"}),
@@ -133,7 +133,7 @@ def update_aqi_line_chart(time_interval):
 
     # Hover Label
     aqi_chart.update_layout(hovermode="x unified", hoverlabel=dict(bgcolor="#c1dfff", font_size=12, font_family="Poppins", align="left"))
-    aqi_chart.update_traces(hovertemplate="AQI Count: <b>%{y}</b><extra></extra>")
+    aqi_chart.update_traces(hovertemplate="AQI Measure: <b>%{y}</b><extra></extra>")
     return aqi_chart
 
 # Updating AQI Measures
