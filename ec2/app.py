@@ -12,16 +12,21 @@ from dash_iconify import DashIconify
 from dash import Dash, html, dcc, Input, Output
 from sklearn.linear_model import LinearRegression
 
-def get_data():
-    mysql_host = os.getenv("db_host")
-    mysql_user = os.getenv("db_user")
-    mysql_password = os.getenv("db_password")
-    mysql_db = os.getenv("db_database")
-    print(mysql_host, mysql_user, mysql_password, mysql_db)
-    # Reading the Data
+# Reading Environment
+mysql_host = os.getenv("db_host")
+mysql_user = os.getenv("db_user")
+mysql_password = os.getenv("db_password")
+mysql_db = os.getenv("db_database")
+print(mysql_host, mysql_user, mysql_password, mysql_db)
+
+# Reading the Data
+def get_data(query_type):
     mysql_connection = f"mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}"
     mysql_engine = create_engine(mysql_connection)
-    df = pd.read_sql("SELECT * FROM aqi_measures WHERE time_received >= DATE_SUB(CURDATE(), INTERVAL 1 DAY) ORDER BY time_received DESC", con=mysql_engine)
+    if(query_type == "line"):
+        df = pd.read_sql("SELECT * FROM aqi_measures WHERE time_received >= DATE_SUB(CURDATE(), INTERVAL 1 DAY) ORDER BY time_received DESC", con=mysql_engine)
+    else:
+        df = pd.read_sql("SELECT * FROM aqi_measures", con=mysql_engine)
     mysql_engine.dispose()
     return df
 
@@ -113,7 +118,7 @@ app.layout = html.Div(className="main_layout", children=[
         Input("time_interval", "n_intervals")
 )
 def update_aqi_line_chart(time_interval):
-    df = get_data()
+    df = get_data("line")
     df = df.rename(columns={"aqi_us_count": "AQI_US", "aqi_in_count": "AQI_IN"})
 
     aqi_chart = px.line(df, x="time_received", y=["AQI_US", "AQI_IN"], template="plotly_white")
@@ -124,7 +129,7 @@ def update_aqi_line_chart(time_interval):
     aqi_chart.update_layout(xaxis_showgrid=False, xaxis=dict(tickfont=dict(size=12, family="Poppins", color="#000000"), tickangle=0))
     aqi_chart.update_traces(mode="lines+markers", line=dict(width=2), marker=dict(sizemode="diameter", size=8, color="white", line=dict(width=2.5)))
     aqi_chart.update_yaxes(fixedrange=True)
-    aqi_chart.update_xaxes(tickformat="%d %b %Y \n%I:%M%p")
+    aqi_chart.update_xaxes(tickformat="%d %b %Y\n%I:%M%p")
 
     # Hover Label
     aqi_chart.update_layout(hovermode="x unified", hoverlabel=dict(bgcolor="#c1dfff", font_size=12, font_family="Poppins", align="left"))
@@ -139,7 +144,7 @@ def update_aqi_line_chart(time_interval):
         Input("time_interval", "n_intervals")
         )
 def update_aqi_measures(time_interval):
-    df = get_data()
+    df = get_data("line")
     aqi_us_count = statistics.mean(df["aqi_us_count"])
     aqi_in_count = statistics.mean(df["aqi_in_count"])
     aqi = round(statistics.mean([aqi_us_count, aqi_in_count]))
@@ -170,7 +175,7 @@ def update_aqi_measures(time_interval):
         Input("model_time_interval", "n_intervals")
   )
 def update_aqi_predicted_count(time_interval):
-    df = get_data()
+    df = get_data("ML")
     df["aqi"] = (df["aqi_us_count"] + df["aqi_in_count"]) / 2
     df["time_received"] = pd.to_datetime(df["time_received"])
     df["month"] = df["time_received"].dt.month
