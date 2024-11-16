@@ -61,7 +61,7 @@ app.layout = html.Div(className="main_layout", children=[
                 ])
             ]),
             html.Div(className="aqi_line_chart_legend", children=[
-                html.Div(className="aqi_line_chart_legend_item", children="Air Quality"),
+                html.Div(className="aqi_line_chart_legend_header", children="Air Quality"),
                 html.Div(className="aqi_line_chart_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Satisfactory (51-100)", style={"background-color": "#9ACD32"}),
                 html.Div(className="aqi_line_chart_legend_item", children="Moderate (101-200)", style={"background-color": "#FFC300"}),
@@ -92,8 +92,8 @@ app.layout = html.Div(className="main_layout", children=[
         ]),
         html.Div(className="aqi_measure", children=[
             html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Carbon_Monoxide.png", alt="co", width="30%"), html.P("Carbon Monoxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, size=170, min=0, max=500, units="ug/m^3",
-                color={"gradient": True, "ranges": {"#377A07": [0, 5], "#9ACD32": [5, 10], "#FFC300":[10, 13], "#F58F09": [13, 16], "#C41206":[16, 31], "#810100": [31, 500]}}
+            daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, size=170, min=0, max=5000, units="ug/m^3",
+                color={"gradient": True, "ranges": {"#377A07": [0, 30], "#9ACD32": [30, 50], "#FFC300":[50, 100], "#F58F09": [100, 500], "#C41206":[500, 1000], "#810100": [1000, 5000]}}
             )
         ]),
         html.Div(className="aqi_measure", children=[
