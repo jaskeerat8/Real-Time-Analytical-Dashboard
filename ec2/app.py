@@ -12,15 +12,14 @@ from dash_iconify import DashIconify
 from dash import Dash, html, dcc, Input, Output
 from sklearn.linear_model import LinearRegression
 
-# Reading Environment
-mysql_host = os.getenv("db_host")
-mysql_user = os.getenv("db_user")
-mysql_password = os.getenv("db_password")
-mysql_db = os.getenv("db_database")
-print(mysql_host, mysql_user, mysql_password, mysql_db)
-
 # Reading the Data
 def get_data(query_type):
+    # Reading Environment
+    mysql_host = os.getenv("db_host")
+    mysql_user = os.getenv("db_user")
+    mysql_password = os.getenv("db_password")
+    mysql_db = os.getenv("db_database")
+    print(mysql_host, mysql_user, mysql_password, mysql_db)
     mysql_connection = f"mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}"
     mysql_engine = create_engine(mysql_connection)
     if(query_type == "line"):
