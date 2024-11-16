@@ -132,7 +132,7 @@ def update_aqi_line_chart(time_interval):
 
     # Hover Label
     aqi_chart.update_layout(hovermode="x unified", hoverlabel=dict(bgcolor="#c1dfff", font_size=12, font_family="Poppins", align="left"))
-    aqi_chart.update_traces(hovertemplate="AQI Measure: <b>%{y}</b><extra></extra>")
+    aqi_chart.update_traces(hovertemplate="AQI Count: <b>%{y}</b><extra></extra>")
     return aqi_chart
 
 # Updating AQI Measures
