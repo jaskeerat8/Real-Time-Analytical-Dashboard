@@ -1,4 +1,4 @@
-View Dashboard Here - http://3.25.35.63:8000/ (Give a min to load)
+View Dashboard Here - http://3.25.35.63:8000/ (Give a min to load).
 
 - Scrape Data from publicly available Government Websites for AQI measures as well as use Open Weather API to get real-time updates. The Data is cleaned and appended to the AWS RDS MySQL database.
 - For prediction, a linear model is trained on the historical data collected from Kaggle. The regression model is trained on the date, month and hour measure. The Label produced is shown as the output.
