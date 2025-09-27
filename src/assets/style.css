@@ -13,13 +13,13 @@
 
 /* Header */
 .header {
-    height: 4vh;
+    height: 60px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    padding: 20px;
+    padding: 0px 20px;
     background-color: #17252A;
 }
 .header_text {
@@ -59,12 +59,13 @@
     gap: 10px;
     justify-content: space-between;
     align-items: stretch;
-    padding: 10px;
+    margin: 10px;
 }
 .aqi_line_chart {
     overflow: hidden;
     border-radius: 5px;
     width: 75%;
+    outline: solid;
 }
 .aqi_info {
     width: 25%;
@@ -89,6 +90,7 @@
     width: 100%;
     background-color: white;
     border-radius: 5px;
+    outline: solid;
 }
 .aqi_reading_heading {
     margin: 0px;
@@ -162,7 +164,7 @@
     flex-direction: row;
     justify-content: space-between;
     gap: 10px;
-    height: calc(100% - 4vh - 420px);
+    height: calc(100% - 60px - 40px - 370px - 10px);
     margin: 0px 10px 10px 10px;
 }
 .aqi_measure {
@@ -173,6 +175,7 @@
     align-items: center;
     border-radius: 5px;
     background-color: white;
+    outline: solid;
 }
 .aqi_measure_header {
     color: black;
@@ -188,6 +191,27 @@
 .aqi_measure_gauge {
     overflow: hidden;
 }
-.cAPXWV {
+.sc-gZMcBi.jjZFEi > div {
     color: #052F5F !important;
+}
+
+
+/* Footer */
+.footer {
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: #17252A;
+    margin: 0px;
+    padding: 0px;
+}
+.footer_text {
+    color: white;
+    font-size: 15px;
+    font-family: "Poppins";
+    font-weight: 500;
+    margin: 0px;
+    padding: 0px;
 }

@@ -1,10 +1,10 @@
 # Importing Libraries
 import os
-import json
 import boto3
 import statistics
+import pickle
 import pandas as pd
-from sqlalchemy import create_engine
+from io import StringIO
 import pytz
 from datetime import datetime, timedelta
 import dash_daq as daq
@@ -12,114 +12,122 @@ import plotly.express as px
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 from dash import Dash, html, dcc, Input, Output
-import pickle
+from dotenv import load_dotenv
+
+# Loading Environment
+load_dotenv()
+
+# Credentials
+aws_region = "ap-south-1"
+weather_api_key = os.environ.get("weather_api_key")
+aws_access_key_id = os.environ.get("aws_access_key_id")
+aws_secret_access_key = os.environ.get("aws_secret_access_key")
 
 # Loading ML Model
 with open("model.pkl", "rb") as f:
     model = pickle.load(f)
 
+# Reading Data from Lambda
 def get_data():
-    # Setting up Boto3 Client
-    region_name = "ap-southeast-2"
-    secret_name = "rdsMYSQL"
-    session = boto3.session.Session(region_name=region_name, aws_access_key_id=os.environ.get("aws_access_key_id"), aws_secret_access_key=os.environ.get("aws_secret_access_key"))
-    sm_client = session.client(service_name="secretsmanager")
+    s3_data_path = "s3://github-projects-resume/Real_Time_Analytical_Dashboard/data/final/output.csv"
+    bucket_name = s3_data_path.split("/")[2]
+    file_key = "/".join(s3_data_path.split("/")[3:])
 
-    # Reading Data from Secrets Manager
-    get_secret_value_response = sm_client.get_secret_value(SecretId=secret_name)
-    value = json.loads(get_secret_value_response["SecretString"])
-    mysql_host = value["endpoint"]
-    mysql_user = value["user"]
-    mysql_password = value["password"]
-    mysql_db = value["database"]
+    s3_client = boto3.client("s3", region_name=aws_region, aws_access_key_id=aws_access_key_id,
+                             aws_secret_access_key=aws_secret_access_key)
 
-    # Reading the Data
-    mysql_connection = f"mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}"
-    mysql_engine = create_engine(mysql_connection)
-    df = pd.read_sql("SELECT * FROM aqi_measures WHERE time_received >= DATE_SUB(CURDATE(), INTERVAL 1 DAY) ORDER BY time_received DESC", con=mysql_engine)
-    mysql_engine.dispose()
+    response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
+    csv_content = response['Body'].read().decode('utf-8')
+    df = pd.read_csv(StringIO(csv_content))
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
     return df
 
 # Defining Layout
 app = Dash(__name__, external_stylesheets=["https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"])
 server = app.server
 app.title = "AQI Measure"
-app.layout = html.Div(className="main_layout", children=[
-    dcc.Interval(id="time_interval", interval=60000),
-    dcc.Interval(id="model_time_interval", interval=1800000),
-    html.Div(className="header", children=[
-        dmc.Text("Chandigarh AQI", className="header_text"),
-        html.Div(className="header_measure", children=[DashIconify(icon="fluent:temperature-16-filled", color="white", width=25), html.P(id="header_temperature")]),
-        html.Div(className="header_measure", children=[DashIconify(icon="carbon:humidity", color="white", width=25), html.P(id="header_humidity")]),
-        html.Div(className="header_measure", children=[DashIconify(icon="tabler:uv-index", color="white", width=25), html.P(id="header_uv")]),
-        html.Div(className="header_measure", children=[DashIconify(icon="mi:wind", color="white", width=25), html.P(id="header_wind")]),
-        dmc.Text(className="header_date", id="header_date")
-    ]),
-    html.Div(className="aqi_line_chart_container", children=[
-        html.Div(className="aqi_line_chart", children=dcc.Graph(id="aqi_line_chart", config={"displayModeBar": False})),
-        html.Div(className="aqi_info", children=[
-            html.Div(className="aqi_reading_container", children=[
-                html.Div(className="aqi_reading", children=[
-                    html.P(className="aqi_reading_heading", children="Current AQI"),
-                    html.P(className="aqi_reading_count_actual", id="aqi_reading_count_actual"),
-                    html.P(className="aqi_reading_subheader", children="(24 Hour Average)")
+app.layout = dmc.MantineProvider(
+    children = html.Div(className="main_layout", children=[
+        dcc.Interval(id="time_interval", interval=300000),
+        dcc.Interval(id="model_time_interval", interval=1800000),
+        html.Div(className="header", children=[
+            dmc.Text("Chandigarh AQI", className="header_text"),
+            html.Div(className="header_measure", children=[DashIconify(icon="fluent:temperature-16-filled", color="white", width=25), html.P(id="header_temperature")]),
+            html.Div(className="header_measure", children=[DashIconify(icon="carbon:humidity", color="white", width=25), html.P(id="header_humidity")]),
+            html.Div(className="header_measure", children=[DashIconify(icon="tabler:uv-index", color="white", width=25), html.P(id="header_uv")]),
+            html.Div(className="header_measure", children=[DashIconify(icon="mi:wind", color="white", width=25), html.P(id="header_wind"),
+                html.Img(id="header_wind_direction", src="https://github-projects-resume.s3.ap-south-1.amazonaws.com/Real_Time_Analytical_Dashboard/resources/wind_arrow.png", alt="wind direction", width="20px")]),
+            dmc.Text(className="header_date", id="header_date")
+        ]),
+        html.Div(className="aqi_line_chart_container", children=[
+            html.Div(className="aqi_line_chart", children=dcc.Graph(id="aqi_line_chart", config={"displayModeBar": False})),
+            html.Div(className="aqi_info", children=[
+                html.Div(className="aqi_reading_container", children=[
+                    html.Div(className="aqi_reading", children=[
+                        html.P(className="aqi_reading_heading", children="Current AQI"),
+                        html.P(className="aqi_reading_count_actual", id="aqi_reading_count_actual"),
+                        html.P(className="aqi_reading_subheader", children="(24 Hour Average)")
+                    ]),
+                    html.Div(className="aqi_reading", children=[
+                        html.P(className="aqi_reading_heading", children="Next ML Predicted AQI"),
+                        html.P(className="aqi_reading_count_predicted", id="aqi_reading_count_predicted"),
+                        html.P(className="aqi_reading_subheader", children="(Per Hour)")
+                    ])
                 ]),
-                html.Div(className="aqi_reading", children=[
-                    html.P(className="aqi_reading_heading", children="Next ML Predicted AQI"),
-                    html.P(className="aqi_reading_count_predicted", id="aqi_reading_count_predicted"),
-                    html.P(className="aqi_reading_subheader", children="(Per Hour)")
+                html.Div(className="aqi_line_chart_legend", children=[
+                    html.Div(className="aqi_line_chart_legend_header", children="Air Quality Index"),
+                    html.Div(className="aqi_line_chart_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
+                    html.Div(className="aqi_line_chart_legend_item", children="Satisfactory (51-100)", style={"background-color": "#9ACD32"}),
+                    html.Div(className="aqi_line_chart_legend_item", children="Moderate (101-200)", style={"background-color": "#FFC300"}),
+                    html.Div(className="aqi_line_chart_legend_item", children="Poor (201-300)", style={"background-color": "#F58F09"}),
+                    html.Div(className="aqi_line_chart_legend_item", children="Very Poor (301-400)", style={"background-color": "#C41206"}),
+                    html.Div(className="aqi_line_chart_legend_item", children="Severe (401+)", style={"background-color": "#810100"})
                 ])
-            ]),
-            html.Div(className="aqi_line_chart_legend", children=[
-                html.Div(className="aqi_line_chart_legend_header", children="Air Quality"),
-                html.Div(className="aqi_line_chart_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Satisfactory (51-100)", style={"background-color": "#9ACD32"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Moderate (101-200)", style={"background-color": "#FFC300"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Poor (201-300)", style={"background-color": "#F58F09"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Very Poor (301-400)", style={"background-color": "#C41206"}),
-                html.Div(className="aqi_line_chart_legend_item", children="Severe (401-500)", style={"background-color": "#810100"})
             ])
-        ])
-    ]),
-    html.Div(className="aqi_measure_row", children=[
-        html.Div(className="aqi_measure", children=[
-            html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud", color="black", width=25), html.P("PM2.5")]),
-            daq.Gauge(className="aqi_measure_gauge", id="PM25_gauge", showCurrentValue=True, value=0, size=170, min=0, max=380, units="ug/m^3",
-                color={"gradient": True, "ranges": {"#377A07": [0, 30], "#9ACD32": [30, 60], "#FFC300":[60, 90], "#F58F09": [90, 120], "#C41206":[120, 250], "#810100": [250, 380]}}
-            )
         ]),
-        html.Div(className="aqi_measure", children=[
-            html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud-solid", color="black", width=25), html.P("PM10")]),
-            daq.Gauge(className="aqi_measure_gauge", id="PM10_gauge", showCurrentValue=True, value=0, size=170, min=0, max=700, units="ug/m^3",
-                color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 250], "#F58F09": [250, 350], "#C41206":[350, 430], "#810100": [430, 700]}}
-            )
+        html.Div(className="aqi_measure_row", children=[
+            html.Div(className="aqi_measure", children=[
+                html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud", color="black", width=25), html.P("PM2.5")]),
+                daq.Gauge(className="aqi_measure_gauge", id="PM25_gauge", showCurrentValue=True, value=0, size=170, min=0, max=500, units="ug/m³",
+                    color={"gradient": True, "ranges": {"#377A07": [0, 30], "#9ACD32": [30, 60], "#FFC300":[60, 90], "#F58F09": [90, 120], "#C41206":[120, 250], "#810100": [250, 500]}}
+                )
+            ]),
+            html.Div(className="aqi_measure", children=[
+                html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud-solid", color="black", width=25), html.P("PM10")]),
+                daq.Gauge(className="aqi_measure_gauge", id="PM10_gauge", showCurrentValue=True, value=0, size=170, min=0, max=700, units="ug/m³",
+                    color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 250], "#F58F09": [250, 350], "#C41206":[350, 430], "#810100": [430, 700]}}
+                )
+            ]),
+            html.Div(className="aqi_measure", children=[
+                html.Div(className="aqi_measure_header", children=[html.Img(src="https://github-projects-resume.s3.ap-south-1.amazonaws.com/Real_Time_Analytical_Dashboard/resources/Sulfur_Dioxide.png", alt="so2", width="30%"), html.P("Sulfur Dioxide")]),
+                daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=2600, units="ug/m³",
+                    color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 380], "#F58F09": [380, 800], "#C41206":[800, 1600], "#810100": [1600, 2600]}}
+                )
+            ]),
+            html.Div(className="aqi_measure", children=[
+                html.Div(className="aqi_measure_header", children=[html.Img(src="https://github-projects-resume.s3.ap-south-1.amazonaws.com/Real_Time_Analytical_Dashboard/resources/Carbon_Monoxide.png", alt="co", width="20%"), html.P("Carbon Monoxide")]),
+                daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, size=170, min=0, max=100, units="mg/m³",
+                    color={"gradient": True, "ranges": {"#377A07": [0, 1], "#9ACD32": [1, 2], "#FFC300":[2, 10], "#F58F09": [10, 17], "#C41206":[17, 34], "#810100": [34, 100]}}
+                )
+            ]),
+            html.Div(className="aqi_measure", children=[
+                html.Div(className="aqi_measure_header", children=[html.Img(src="https://github-projects-resume.s3.ap-south-1.amazonaws.com/Real_Time_Analytical_Dashboard/resources/Ozone.png", alt="o3", width="15%"), html.P("Ozone")]),
+                daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, value=0, size=170, min=0, max=1000, units="ug/m³",
+                    color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 168], "#F58F09": [168, 208], "#C41206":[208, 748], "#810100": [748, 1000]}}
+                )
+            ]),
+            html.Div(className="aqi_measure", children=[
+                html.Div(className="aqi_measure_header", children=[html.Img(src="https://github-projects-resume.s3.ap-south-1.amazonaws.com/Real_Time_Analytical_Dashboard/resources/Nitrogen_Dioxide.png", alt="no2", width="20%"), html.P("Nitrogen Dioxide")]),
+                daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=800, units="ug/m³",
+                    color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 180], "#F58F09": [180, 280], "#C41206":[280, 400], "#810100": [400, 800]}}
+                )
+            ])
         ]),
-        html.Div(className="aqi_measure", children=[
-            html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Sulfur_Dioxide.png", alt="so2", width="30%"), html.P("Sulfur Dioxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=2000, units="ppm",
-                color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 380], "#F58F09": [380, 800], "#C41206":[800, 1600], "#810100": [1600, 2000]}}
-            )
-        ]),
-        html.Div(className="aqi_measure", children=[
-            html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Carbon_Monoxide.png", alt="co", width="30%"), html.P("Carbon Monoxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, size=170, min=0, max=500, units="ug/m^3",
-                color={"gradient": True, "ranges": {"#377A07": [0, 5], "#9ACD32": [5, 10], "#FFC300":[10, 13], "#F58F09": [13, 16], "#C41206":[16, 31], "#810100": [31, 500]}}
-            )
-        ]),
-        html.Div(className="aqi_measure", children=[
-            html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/ozone.png", alt="o3", width="15%"), html.P("Ozone")]),
-            daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, value=0, size=170, min=0, max=450, units="ppm",
-                color={"gradient": True, "ranges": {"#377A07": [0, 26], "#9ACD32": [26, 51], "#FFC300":[51, 87], "#F58F09": [87, 107], "#C41206":[107, 382], "#810100": [382, 450]}}
-            )
-        ]),
-        html.Div(className="aqi_measure", children=[
-            html.Div(className="aqi_measure_header", children=[html.Img(src="https://jassi-images.s3.ap-southeast-2.amazonaws.com/Nitrogen_Dioxide.png", alt="no2", width="30%"), html.P("Nitrogen Dioxide")]),
-            daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, value=0, size=170, min=0, max=750, units="ppm",
-                color={"gradient": True, "ranges": {"#377A07": [0, 22], "#9ACD32": [22, 44], "#FFC300":[44, 97], "#F58F09": [97, 150], "#C41206":[150, 214], "#810100": [214, 750]}}
-            )
+        html.Div(className="footer", children=[
+            dmc.Text("Following Indian Central Pollution Control Board (CPCB) Standard", className="footer_text")
         ])
     ])
-])
+)
 
 
 # Updating AQI Line Chart
@@ -129,9 +137,9 @@ app.layout = html.Div(className="main_layout", children=[
 )
 def update_aqi_line_chart(time_interval):
     df = get_data()
-    df = df.rename(columns={"aqi_us_count": "AQI_US", "aqi_in_count": "AQI_IN"})
+    df = df.rename(columns={"aqi_us": "AQI_US", "aqi_in": "AQI_IN"})
 
-    aqi_chart = px.line(df, x="time_received", y=["AQI_US", "AQI_IN"], template="plotly_white")
+    aqi_chart = px.line(df, x="timestamp", y=["AQI_US", "AQI_IN"], template="plotly_white")
     aqi_chart.update_layout(margin=dict(l=0, r=0, b=0, t=0), height=350)
     aqi_chart.update_layout(legend=dict(font=dict(color="#000000", size=14, family="Poppins"), traceorder="grouped", orientation="h", x=0.993, y=1, xanchor="right", yanchor="bottom", title_text=""))
     aqi_chart.update_layout(xaxis_title="", yaxis_title="", legend_title_text="")
@@ -146,24 +154,38 @@ def update_aqi_line_chart(time_interval):
     aqi_chart.update_traces(hovertemplate="AQI Count: <b>%{y}</b><extra></extra>")
     return aqi_chart
 
+
 # Updating AQI Measures
-@app.callback(
-    [Output("header_date", "children"), Output("aqi_reading_count_actual", "children"), Output("PM25_gauge", "value"), Output("PM10_gauge", "value"),
-     Output("so2_gauge", "value"), Output("co_gauge", "value"), Output("o3_gauge", "value"), Output("no2_gauge", "value"),
-     Output("header_temperature", "children"), Output("header_humidity", "children"), Output("header_uv", "children"), Output("header_wind", "children")],
+@app.callback([Output("header_date", "children"),
+     Output("aqi_reading_count_actual", "children"),
+     Output("PM25_gauge", "value"),
+     Output("PM10_gauge", "value"),
+     Output("so2_gauge", "value"),
+     Output("co_gauge", "value"),
+     Output("o3_gauge", "value"),
+     Output("no2_gauge", "value"),
+     Output("header_temperature", "children"),
+     Output("header_humidity", "children"),
+     Output("header_uv", "children"),
+     Output("header_wind", "children"),
+    Output("header_wind_direction", "style")],
     Input("time_interval", "n_intervals")
 )
 def update_aqi_measures(time_interval):
     df = get_data()
-    aqi_us_count = statistics.mean(df["aqi_us_count"])
-    aqi_in_count = statistics.mean(df["aqi_in_count"])
+    measures = df.iloc[-1]
+    aqi_us_count = measures["aqi_us"]
+    aqi_in_count = measures["aqi_in"]
     aqi = round(statistics.mean([aqi_us_count, aqi_in_count]))
 
-    measures = df.iloc[0]
-    time_received = "Last Update (IST):\n" + measures["time_received"].strftime("%d %B %Y, %I:%M %p")
+    time_received = "Last Update (IST):\n" + measures["timestamp"].strftime("%d %B %Y, %I:%M %p")
     temperature = str(measures["temperature"]) + " °C"
     humidity = str(measures["humidity"]) + "%"
     wind = str(measures["wind"]) + " km/hr"
+    wind_degree = {
+        "transition": "transform 0.5s",
+        "transform": f"rotate({measures["wind_degree"]}deg)"
+    }
 
     uv = measures["uv"]
     if(uv > 11):
@@ -177,7 +199,8 @@ def update_aqi_measures(time_interval):
     else:
         uv = str(uv) + " (Low)"
 
-    return time_received, aqi, measures["pm25"], measures["pm10"], measures["so2"], measures["co"], measures["o3"], measures["no2"], temperature, humidity, uv, wind
+    return time_received, aqi, measures["pm2_5"], measures["pm10"], measures["so2"], measures["co"], measures["o3"], measures["no2"], temperature, humidity, uv, wind, wind_degree
+
 
 # Updating AQI Predicted Value
 @app.callback(
@@ -193,4 +216,4 @@ def update_aqi_predicted_count(time_interval):
 
 # Running Main App
 if __name__ == "__main__":
-    app.run_server(debug=False)
+    app.run(debug=False, host="0.0.0.0", port=8000)

@@ -1,0 +1,37 @@
+pollutant,low_concentration,upper_concentration,low_aqi,upper_aqi,category
+pm2_5,0,30,0,50,good
+pm2_5,31,60,51,100,satisfactory
+pm2_5,61,90,101,200,moderate
+pm2_5,91,120,201,300,poor
+pm2_5,121,250,301,400,very poor
+pm2_5,251,500,401,500,severe
+pm10,0,50,0,50,good
+pm10,51,100,51,100,satisfactory
+pm10,101,250,101,200,moderate
+pm10,251,350,201,300,poor
+pm10,351,430,301,400,very poor
+pm10,431,1000,401,500,severe
+no2,0,40,0,50,good
+no2,41,80,51,100,satisfactory
+no2,81,180,101,200,moderate
+no2,181,280,201,300,poor
+no2,281,400,301,400,very poor
+no2,401,800,401,500,severe
+so2,0,40,0,50,good
+so2,41,80,51,100,satisfactory
+so2,81,380,101,200,moderate
+so2,381,800,201,300,poor
+so2,801,1600,301,400,very poor
+so2,1601,2620,401,500,severe
+co,0,1,0,50,good
+co,1,2,51,100,satisfactory
+co,2,10,101,200,moderate
+co,10,17,201,300,poor
+co,17,34,301,400,very poor
+co,34,100,401,500,severe
+o3,0,50,0,50,good
+o3,51,100,51,100,satisfactory
+o3,101,168,101,200,moderate
+o3,169,208,201,300,poor
+o3,209,748,301,400,very poor
+o3,749,1000,401,500,severe
