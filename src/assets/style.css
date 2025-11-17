@@ -168,7 +168,8 @@
     margin: 0px 10px 10px 10px;
 }
 .aqi_measure {
-    width: 100%;
+    width: calc(100% / 6 - 70px);
+    flex: 1 1 calc(50% / 6);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -187,9 +188,22 @@
     gap: 10px;
     justify-content: center;
     align-items: center;
+    white-space: nowrap;
 }
-.aqi_measure_gauge {
-    overflow: hidden;
+.aqi_measure_flag {
+    color: white;
+    font-size: 14px;
+    font-family: "Poppins";
+    font-weight: 600;
+    background-color: red;
+    width: 100%;
+    text-align: center;
+}
+.aqi_measure_gauge svg {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+    text-align: center;
 }
 .sc-gZMcBi.jjZFEi > div {
     color: #052F5F !important;
