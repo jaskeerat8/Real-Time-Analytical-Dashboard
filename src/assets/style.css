@@ -144,18 +144,29 @@
     border-radius: 5px 5px 0px 0px;
 }
 .aqi_line_chart_legend_item {
+    padding: 0px 3%;
     height: 100%;
     color: white;
-    font-size: 16px;
     font-family: "Poppins";
-    font-weight: 500;
     display: flex;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
     border: 2px solid black;
 }
 .aqi_line_chart_legend_item:last-child {
     border-radius: 0px 0px 5px 5px;
+}
+.aqi_line_chart_legend_item b {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0px;
+    padding: 0px;
+}
+.aqi_line_chart_legend_item p {
+    font-size: 10px;
+    margin: 0px;
+    padding: 0px;
 }
 
 /* AQI Measures */
@@ -172,11 +183,17 @@
     flex: 1 1 calc(50% / 6);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: center;
     border-radius: 5px;
     background-color: white;
     outline: solid;
+    overflow: hidden;
+}
+.aqi_measure_top {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
 }
 .aqi_measure_header {
     color: black;
@@ -199,10 +216,24 @@
     width: 100%;
     text-align: center;
 }
+.aqi_measure_gauge {
+    flex: 0 0 auto !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 15px;
+}
+.aqi_measure_gauge circle {
+    stroke-width: 10px;
+}
+.aqi_measure_gauge label {
+    font-size: 12px;
+    text-transform: none;
+}
 .aqi_measure_gauge svg {
-    width: 100% !important;
-    height: auto !important;
-    max-width: 100%;
+    height: 100%;
+    width: auto;
+    max-height: 200px !important;
     text-align: center;
 }
 .sc-gZMcBi.jjZFEi > div {

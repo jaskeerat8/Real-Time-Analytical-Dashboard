@@ -144,9 +144,16 @@ def read_s3():
     )
     all_files = fs.glob(f"{raw_data_path}/**/*.parquet")
 
-    df = pd.concat([pd.read_parquet(file, filesystem=fs) for file in all_files], ignore_index=True)
+    valid_files = []
+    for file in all_files:
+        if fs.exists(file) and fs.info(file)['type'] == 'file' and file.endswith(".parquet"):
+            valid_files.append(file)
+
+    df = pd.concat([pd.read_parquet(file, filesystem=fs) for file in valid_files], ignore_index=True)
     df = df.drop_duplicates(subset=["timestamp", "aqi_in", "pm2_5", "pm10", "so2", "co", "o3", "no2"], keep='last')
     df["timestamp"] = pd.to_datetime(df["timestamp"], format="%d-%m-%Y %H:%M:%S")
+
+    df = df[df["timestamp"] >= pd.Timestamp.now(tz="Asia/Kolkata") - pd.Timedelta(days=7)]
     df.sort_values(["timestamp"], ascending=True, inplace=True)
     df = df.reset_index(drop=True)
     return df
@@ -200,7 +207,7 @@ def lambda_handler(event=None, context=None):
     raw_to_s3(raw_df)
 
     # Read all Raw s3 Data
-    time.sleep(30)
+    time.sleep(120)
     df = read_s3()
 
     # Calculate AQI 24 hrs

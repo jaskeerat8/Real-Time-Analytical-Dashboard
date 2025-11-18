@@ -87,55 +87,67 @@ app.layout = dmc.MantineProvider(
                 ]),
                 html.Div(className="aqi_line_chart_legend", children=[
                     html.Div(className="aqi_line_chart_legend_header", children="Air Quality Index"),
-                    html.Div(className="aqi_line_chart_legend_item", children="Good (0-50)", style={"background-color": "#377A07"}),
-                    html.Div(className="aqi_line_chart_legend_item", children="Satisfactory (51-100)", style={"background-color": "#9ACD32"}),
-                    html.Div(className="aqi_line_chart_legend_item", children="Moderate (101-200)", style={"background-color": "#FFC300"}),
-                    html.Div(className="aqi_line_chart_legend_item", children="Poor (201-300)", style={"background-color": "#F58F09"}),
-                    html.Div(className="aqi_line_chart_legend_item", children="Very Poor (301-400)", style={"background-color": "#C41206"}),
-                    html.Div(className="aqi_line_chart_legend_item", children="Severe (401+)", style={"background-color": "#810100"})
+                    html.Div(className="aqi_line_chart_legend_item", children=[html.B("Good (0-50)"), html.P("Ideal for all activities")], style={"background-color": "#377A07"}),
+                    html.Div(className="aqi_line_chart_legend_item", children=[html.B("Satisfactory (51-100)"), html.P("Minor impact on health")], style={"background-color": "#9ACD32"}),
+                    html.Div(className="aqi_line_chart_legend_item", children=[html.B("Moderate (101-200)"), html.P("Possible discomfort outdoors")], style={"background-color": "#FFC300"}),
+                    html.Div(className="aqi_line_chart_legend_item", children=[html.B("Poor (201-300)"), html.P("Limit prolonged outdoor time")], style={"background-color": "#F58F09"}),
+                    html.Div(className="aqi_line_chart_legend_item", children=[html.B("Very Poor (301-400)"), html.P("High risk for all")], style={"background-color": "#C41206"}),
+                    html.Div(className="aqi_line_chart_legend_item", children=[html.B("Severe (401+)"), html.P("Serious hazards to health")], style={"background-color": "#810100"})
                 ])
             ])
         ]),
         html.Div(className="aqi_measure_row", children=[
             html.Div(className="aqi_measure", children=[
-                html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud", color="black", width=25), html.P("PM2.5")]),
-                html.Div(className="aqi_measure_flag", id="aqi_measure_flag_pm25", children="Dominant Pollutant"),
-                daq.Gauge(className="aqi_measure_gauge", id="pm25_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=500, units="ug/m³",
+                html.Div(className="aqi_measure_top", children=[
+                    html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud", color="black", width=25), html.P("PM2.5")]),
+                    html.Div(className="aqi_measure_flag", id="aqi_measure_flag_pm25", children="Dominant Pollutant")
+                ]),
+                daq.Gauge(className="aqi_measure_gauge", id="pm25_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=500, units="µg/m³",
                     color={"gradient": True, "ranges": {"#377A07": [0, 30], "#9ACD32": [30, 60], "#FFC300":[60, 90], "#F58F09": [90, 120], "#C41206":[120, 250], "#810100": [250, 500]}}
                 )
             ]),
             html.Div(className="aqi_measure", children=[
-                html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud-solid", color="black", width=25), html.P("PM10")]),
-                html.Div(className="aqi_measure_flag", id="aqi_measure_flag_pm10", children="Dominant Pollutant"),
-                daq.Gauge(className="aqi_measure_gauge", id="pm10_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=700, units="ug/m³",
-                    color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 250], "#F58F09": [250, 350], "#C41206":[350, 430], "#810100": [430, 700]}}
+                html.Div(className="aqi_measure_top", children=[
+                    html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud-solid", color="black", width=25), html.P("PM10")]),
+                    html.Div(className="aqi_measure_flag", id="aqi_measure_flag_pm10", children="Dominant Pollutant")
+                ]),
+                daq.Gauge(className="aqi_measure_gauge", id="pm10_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=600, units="µg/m³",
+                    color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 250], "#F58F09": [250, 350], "#C41206":[350, 430], "#810100": [430, 600]}}
                 )
             ]),
             html.Div(className="aqi_measure", children=[
-                html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Sulfur_Dioxide.png", alt="so2", width="30%"), html.P("Sulfur Dioxide")]),
-                html.Div(className="aqi_measure_flag", id="aqi_measure_flag_so2", children="Dominant Pollutant"),
-                daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=2600, units="ug/m³",
+                html.Div(className="aqi_measure_top", children=[
+                    html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Sulfur_Dioxide.png", alt="so2", width="30%"), html.P("Sulfur Dioxide")]),
+                    html.Div(className="aqi_measure_flag", id="aqi_measure_flag_so2", children="Dominant Pollutant")
+                ]),
+                daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=2600, units="µg/m³",
                     color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 380], "#F58F09": [380, 800], "#C41206":[800, 1600], "#810100": [1600, 2600]}}
                 )
             ]),
             html.Div(className="aqi_measure", children=[
-                html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Carbon_Monoxide.png", alt="co", width="20%"), html.P("Carbon Monoxide")]),
-                html.Div(className="aqi_measure_flag", id="aqi_measure_flag_co", children="Dominant Pollutant"),
-                daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, min=0, max=100, units="mg/m³",
-                    color={"gradient": True, "ranges": {"#377A07": [0, 1], "#9ACD32": [1, 2], "#FFC300":[2, 10], "#F58F09": [10, 17], "#C41206":[17, 34], "#810100": [34, 100]}}
+                html.Div(className="aqi_measure_top", children=[
+                    html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Carbon_Monoxide.png", alt="co", width="20%"), html.P("Carbon Monoxide")]),
+                    html.Div(className="aqi_measure_flag", id="aqi_measure_flag_co", children="Dominant Pollutant")
+                ]),
+                daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, min=0, max=50, units="mg/m³",
+                    color={"gradient": True, "ranges": {"#377A07": [0, 1], "#9ACD32": [1, 2], "#FFC300":[2, 10], "#F58F09": [10, 17], "#C41206":[17, 34], "#810100": [34, 50]}}
                 )
             ]),
             html.Div(className="aqi_measure", children=[
-                html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Ozone.png", alt="o3", width="15%"), html.P("Ozone")]),
-                html.Div(className="aqi_measure_flag", id="aqi_measure_flag_o3", children="Dominant Pollutant"),
-                daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=1000, units="ug/m³",
+                html.Div(className="aqi_measure_top", children=[
+                    html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Ozone.png", alt="o3", width="15%"), html.P("Ozone")]),
+                    html.Div(className="aqi_measure_flag", id="aqi_measure_flag_o3", children="Dominant Pollutant")
+                ]),
+                daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=1000, units="µg/m³",
                     color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 168], "#F58F09": [168, 208], "#C41206":[208, 748], "#810100": [748, 1000]}}
                 )
             ]),
             html.Div(className="aqi_measure", children=[
-                html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Nitrogen_Dioxide.png", alt="no2", width="20%"), html.P("Nitrogen Dioxide")]),
-                html.Div(className="aqi_measure_flag", id="aqi_measure_flag_no2", children="Dominant Pollutant"),
-                daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=800, units="ug/m³",
+                html.Div(className="aqi_measure_top", children=[
+                    html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Nitrogen_Dioxide.png", alt="no2", width="20%"), html.P("Nitrogen Dioxide")]),
+                    html.Div(className="aqi_measure_flag", id="aqi_measure_flag_no2", children="Dominant Pollutant")
+                ]),
+                daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=800, units="µg/m³",
                     color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 180], "#F58F09": [180, 280], "#C41206":[280, 400], "#810100": [400, 800]}}
                 )
             ])
@@ -164,7 +176,7 @@ def update_aqi_line_chart(time_interval):
     aqi_chart.update_layout(title={"text": "<b>Air Quality Trend</b>", "x": 0.03, "y": 0.92, "yanchor": "top"}, title_font_color="#052F5F", title_font=dict(size=20, family="Poppins"))
     aqi_chart.update_layout(legend=dict(font=dict(color="#000000", size=14, family="Poppins"), orientation="h", x=0.99, y=1.15, xanchor="right", yanchor="top", title_text=""))
     aqi_chart.update_layout(xaxis_title="", yaxis_title="", legend_title_text="")
-    aqi_chart.update_layout(yaxis_showgrid=True, yaxis_ticksuffix="  ", yaxis=dict(dtick=25, tickfont=dict(size=12, family="Poppins", color="black"), griddash="dash", gridwidth=1, gridcolor="#DADADA"))
+    aqi_chart.update_layout(yaxis_showgrid=True, yaxis_ticksuffix="  ", yaxis=dict(tickfont=dict(size=12, family="Poppins", color="black"), griddash="dash", gridwidth=1, gridcolor="#DADADA"))
     aqi_chart.update_layout(xaxis_showgrid=False, xaxis=dict(tickfont=dict(size=12, family="Poppins", color="#000000"), tickangle=0))
     aqi_chart.update_traces(mode="lines+markers", line=dict(width=2), marker=dict(sizemode="diameter", size=8, color="white", line=dict(width=2.5)))
     aqi_chart.update_yaxes(fixedrange=True)
