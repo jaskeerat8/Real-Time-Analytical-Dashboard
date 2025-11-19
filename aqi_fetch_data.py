@@ -35,11 +35,19 @@ def calculate_aqi(df, breakpoint_df):
     aqi_breakpoint = 0
     prominent_pollutant = ""
     for pollutant_key in df.columns:
-        breakpoint_row = breakpoint_df[
-            (breakpoint_df["pollutant"] == pollutant_key) &
-            (breakpoint_df["low_concentration"] <= df[pollutant_key].iloc[0]) &
-            (breakpoint_df["upper_concentration"] >= df[pollutant_key].iloc[0])
-            ].iloc[0]
+
+        pollutant_value = df[pollutant_key].iloc[0]
+        breakpoint_pollutant_df = breakpoint_df[breakpoint_df["pollutant"] == pollutant_key]
+
+        if pollutant_value < breakpoint_pollutant_df["low_concentration"].min():
+            breakpoint_row = breakpoint_pollutant_df.iloc[0]
+        elif pollutant_value > breakpoint_pollutant_df["upper_concentration"].max():
+            breakpoint_row = breakpoint_pollutant_df.iloc[-1]
+        else:
+            breakpoint_row = breakpoint_pollutant_df[
+                (breakpoint_pollutant_df["low_concentration"] <= pollutant_value) &
+                (breakpoint_pollutant_df["upper_concentration"] >= pollutant_value)
+                ].iloc[0]
 
         c_low = breakpoint_row['low_concentration']
         c_high = breakpoint_row['upper_concentration']

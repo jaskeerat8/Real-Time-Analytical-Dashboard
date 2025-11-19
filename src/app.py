@@ -102,54 +102,66 @@ app.layout = dmc.MantineProvider(
                     html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud", color="black", width=25), html.P("PM2.5")]),
                     html.Div(className="aqi_measure_flag", id="aqi_measure_flag_pm25", children="Dominant Pollutant")
                 ]),
-                daq.Gauge(className="aqi_measure_gauge", id="pm25_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=500, units="µg/m³",
-                    color={"gradient": True, "ranges": {"#377A07": [0, 30], "#9ACD32": [30, 60], "#FFC300":[60, 90], "#F58F09": [90, 120], "#C41206":[120, 250], "#810100": [250, 500]}}
-                )
+                html.Div(className="aqi_measure_gauge_container", children=[
+                    daq.Gauge(className="aqi_measure_gauge", id="pm25_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=500, units="µg/m³",
+                        color={"gradient": True, "ranges": {"#377A07": [0, 30], "#9ACD32": [30, 60], "#FFC300":[60, 90], "#F58F09": [90, 120], "#C41206":[120, 250], "#810100": [250, 500]}}
+                    )
+                ])
             ]),
             html.Div(className="aqi_measure", children=[
                 html.Div(className="aqi_measure_top", children=[
                     html.Div(className="aqi_measure_header", children=[DashIconify(icon="streamline:rain-cloud-solid", color="black", width=25), html.P("PM10")]),
                     html.Div(className="aqi_measure_flag", id="aqi_measure_flag_pm10", children="Dominant Pollutant")
                 ]),
-                daq.Gauge(className="aqi_measure_gauge", id="pm10_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=600, units="µg/m³",
-                    color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 250], "#F58F09": [250, 350], "#C41206":[350, 430], "#810100": [430, 600]}}
-                )
+                html.Div(className="aqi_measure_gauge_container", children=[
+                    daq.Gauge(className="aqi_measure_gauge", id="pm10_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=600, units="µg/m³",
+                        color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 250], "#F58F09": [250, 350], "#C41206":[350, 430], "#810100": [430, 600]}}
+                    )
+                ])
             ]),
             html.Div(className="aqi_measure", children=[
                 html.Div(className="aqi_measure_top", children=[
                     html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Sulfur_Dioxide.png", alt="so2", width="30%"), html.P("Sulfur Dioxide")]),
                     html.Div(className="aqi_measure_flag", id="aqi_measure_flag_so2", children="Dominant Pollutant")
                 ]),
-                daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=2600, units="µg/m³",
-                    color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 380], "#F58F09": [380, 800], "#C41206":[800, 1600], "#810100": [1600, 2600]}}
-                )
+                html.Div(className="aqi_measure_gauge_container", children=[
+                    daq.Gauge(className="aqi_measure_gauge", id="so2_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=2600, units="µg/m³",
+                        color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 380], "#F58F09": [380, 800], "#C41206":[800, 1600], "#810100": [1600, 2600]}}
+                    )
+                ])
             ]),
             html.Div(className="aqi_measure", children=[
                 html.Div(className="aqi_measure_top", children=[
                     html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Carbon_Monoxide.png", alt="co", width="20%"), html.P("Carbon Monoxide")]),
                     html.Div(className="aqi_measure_flag", id="aqi_measure_flag_co", children="Dominant Pollutant")
                 ]),
-                daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, min=0, max=50, units="mg/m³",
-                    color={"gradient": True, "ranges": {"#377A07": [0, 1], "#9ACD32": [1, 2], "#FFC300":[2, 10], "#F58F09": [10, 17], "#C41206":[17, 34], "#810100": [34, 50]}}
-                )
+                html.Div(className="aqi_measure_gauge_container", children=[
+                    daq.Gauge(className="aqi_measure_gauge", id="co_gauge", showCurrentValue=True, value=0, min=0, max=50, units="mg/m³",
+                        color={"gradient": True, "ranges": {"#377A07": [0, 1], "#9ACD32": [1, 2], "#FFC300":[2, 10], "#F58F09": [10, 17], "#C41206":[17, 34], "#810100": [34, 50]}}
+                    )
+                ])
             ]),
             html.Div(className="aqi_measure", children=[
                 html.Div(className="aqi_measure_top", children=[
                     html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Ozone.png", alt="o3", width="15%"), html.P("Ozone")]),
                     html.Div(className="aqi_measure_flag", id="aqi_measure_flag_o3", children="Dominant Pollutant")
                 ]),
-                daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=1000, units="µg/m³",
-                    color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 168], "#F58F09": [168, 208], "#C41206":[208, 748], "#810100": [748, 1000]}}
-                )
+                html.Div(className="aqi_measure_gauge_container", children=[
+                    daq.Gauge(className="aqi_measure_gauge", id="o3_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=1000, units="µg/m³",
+                        color={"gradient": True, "ranges": {"#377A07": [0, 50], "#9ACD32": [50, 100], "#FFC300":[100, 168], "#F58F09": [168, 208], "#C41206":[208, 748], "#810100": [748, 1000]}}
+                    )
+                ])
             ]),
             html.Div(className="aqi_measure", children=[
                 html.Div(className="aqi_measure_top", children=[
                     html.Div(className="aqi_measure_header", children=[html.Img(src=image_folder + "Nitrogen_Dioxide.png", alt="no2", width="20%"), html.P("Nitrogen Dioxide")]),
                     html.Div(className="aqi_measure_flag", id="aqi_measure_flag_no2", children="Dominant Pollutant")
                 ]),
-                daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=800, units="µg/m³",
-                    color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 180], "#F58F09": [180, 280], "#C41206":[280, 400], "#810100": [400, 800]}}
-                )
+                html.Div(className="aqi_measure_gauge_container", children=[
+                    daq.Gauge(className="aqi_measure_gauge", id="no2_gauge", showCurrentValue=True, digits=0, value=0, min=0, max=800, units="µg/m³",
+                        color={"gradient": True, "ranges": {"#377A07": [0, 40], "#9ACD32": [40, 80], "#FFC300":[80, 180], "#F58F09": [180, 280], "#C41206":[280, 400], "#810100": [400, 800]}}
+                    )
+                ])
             ])
         ]),
         html.Div(className="footer", children=[
@@ -265,4 +277,4 @@ def update_aqi_predicted_count(time_interval):
 
 # Running Main App
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8000)
+    app.run(debug=False, host="0.0.0.0", port=8000)
