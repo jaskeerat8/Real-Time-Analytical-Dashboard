@@ -67,7 +67,7 @@ app.layout = dmc.MantineProvider(
             html.Div(className="header_measure", children=[DashIconify(icon="carbon:humidity", color="white", width=25), html.P(id="header_humidity")]),
             html.Div(className="header_measure", children=[DashIconify(icon="tabler:uv-index", color="white", width=25), html.P(id="header_uv")]),
             html.Div(className="header_measure", children=[DashIconify(icon="mi:wind", color="white", width=25), html.P(id="header_wind"),
-                                                           html.Img(id="header_wind_direction", src=image_folder + "wind_arrow.png", alt="wind direction", width="20px")]),
+                                                           html.Img(className="header_wind_direction", id="header_wind_direction", src=image_folder + "wind_arrow.png", alt="wind direction", width="20px")]),
             dmc.Text(className="header_date", id="header_date")
         ]),
         html.Div(className="aqi_line_chart_container", children=[
@@ -220,10 +220,7 @@ def update_aqi_measures(time_interval):
     temperature = str(measures["temperature"]) + " °C"
     humidity = str(measures["humidity"]) + "%"
     wind = str(measures["wind"]) + " km/hr"
-    wind_degree = {
-        "transition": "transform 0.5s",
-        "transform": f"rotate({measures['wind_degree']}deg)"
-    }
+    wind_degree = {"--wind-base": f"{measures['wind_degree']}deg"}
 
     uv = measures["uv"]
     if(uv > 11):

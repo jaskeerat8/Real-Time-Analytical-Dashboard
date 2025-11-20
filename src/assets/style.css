@@ -41,6 +41,15 @@
     justify-content: center;
     align-items: center;
 }
+.header_wind_direction {
+    transform-origin: center;
+    animation: wiggle 3s ease-in-out infinite;
+}
+@keyframes wiggle {
+    0%   { transform: rotate(calc(var(--wind-base) - 5deg)); }
+    50%  { transform: rotate(calc(var(--wind-base) + 5deg)); }
+    100% { transform: rotate(calc(var(--wind-base) - 5deg)); }
+}
 .header_date {
     margin: 0px;
     padding: 0px;
