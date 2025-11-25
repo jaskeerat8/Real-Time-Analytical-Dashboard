@@ -1,11 +1,9 @@
 # Importing Libraries
 import os
+from io import StringIO, BytesIO
 import boto3
-import pickle
 import pandas as pd
-from io import StringIO
-import pytz
-from datetime import datetime, timedelta
+import joblib
 import dash_daq as daq
 import plotly.express as px
 import dash_mantine_components as dmc
@@ -14,7 +12,6 @@ from dash import Dash, html, dcc, Input, Output
 from flask import Flask
 from flask_caching import Cache
 from dotenv import load_dotenv
-
 
 # Loading Environment
 load_dotenv()
@@ -35,9 +32,21 @@ app.title = "AQI Dashboard"
 cache = Cache(app.server, config={"CACHE_TYPE": "SimpleCache",  "CACHE_DEFAULT_TIMEOUT": 300})
 
 
-# Loading ML Model
-with open("model.pkl", "rb") as f:
-    model = pickle.load(f)
+# Load ML Model
+def get_ml_prediction(independent_variables):
+    file_location = "s3://github-projects-resume/Real_Time_Analytical_Dashboard/resources/aqi_ml_model.pkl"
+    bucket_name = file_location.split("/")[2]
+    key = "/".join(file_location.split("/")[3:])
+
+    s3_client = boto3.client("s3", region_name=aws_region, aws_access_key_id=aws_access_key_id,
+                             aws_secret_access_key=aws_secret_access_key)
+
+    obj = s3_client.get_object(Bucket=bucket_name, Key=key)
+    model_bytes = BytesIO(obj["Body"].read())
+    model = joblib.load(model_bytes)
+
+    prediction = model.predict(independent_variables)[0]
+    return prediction
 
 # Reading Data from s3
 @cache.memoize()
@@ -266,10 +275,31 @@ def update_prominent_pollutant_flag(time_interval):
     Input("time_interval", "n_intervals")
 )
 def update_aqi_predicted_count(time_interval):
-    upcoming_hour = (datetime.now().astimezone(pytz.timezone("Asia/Kolkata"))+timedelta(hours=1)).hour
-    aqi = model.predict(pd.DataFrame({"Hour": [upcoming_hour]}))[0]
-    aqi = round(aqi)
-    return aqi
+    df = get_data()
+    df = df.tail(4)
+
+    df["month"] = df["timestamp"].dt.month
+    df["day"] = df["timestamp"].dt.day
+    df["hour"] = df["timestamp"].dt.hour
+
+    latest_reading = df.iloc[-1]
+    independent_variables = pd.DataFrame([{
+        "pm10": latest_reading["pm10"],
+        "pm2_5": latest_reading["pm2_5"],
+        "co": latest_reading["co"],
+        "no2": latest_reading["no2"],
+        "o3": latest_reading["o3"],
+        "so2": latest_reading["so2"],
+        "month": latest_reading["month"],
+        "day": latest_reading["day"],
+        "hour": latest_reading["hour"],
+        "aqi_lag1": df.iloc[-1]["aqi_in"],
+        "aqi_lag2": df.iloc[-2]["aqi_in"],
+        "aqi_lag3": df.iloc[-3]["aqi_in"]
+    }])
+
+    predicted_aqi = round(get_ml_prediction(independent_variables))
+    return predicted_aqi
 
 
 # Running Main App

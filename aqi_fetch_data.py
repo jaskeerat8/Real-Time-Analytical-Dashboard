@@ -36,7 +36,7 @@ def calculate_aqi(df, breakpoint_df):
     prominent_pollutant = ""
     for pollutant_key in df.columns:
 
-        pollutant_value = df[pollutant_key].iloc[0]
+        pollutant_value = round(df[pollutant_key].iloc[0])
         breakpoint_pollutant_df = breakpoint_df[breakpoint_df["pollutant"] == pollutant_key]
 
         if pollutant_value < breakpoint_pollutant_df["low_concentration"].min():
@@ -231,7 +231,7 @@ def lambda_handler(event=None, context=None):
     df_8hr_max.index = pd.to_datetime(df_8hr_max.index).date
     final_df = pd.merge(df_24hr_avg, df_8hr_max, left_index=True, right_index=True, how='inner')
     final_df = final_df.loc[[final_df.index.max()]]
-    aqi_24, prominent= calculate_aqi(final_df, breakpoint_df)
+    aqi_24, prominent = calculate_aqi(final_df, breakpoint_df)
     df["aqi_24"] = aqi_24
 
     # Write Final Data
