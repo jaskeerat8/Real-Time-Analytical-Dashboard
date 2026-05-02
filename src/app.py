@@ -19,7 +19,7 @@ load_dotenv()
 # Credentials
 aws_region = "ap-south-1"
 for key, value in os.environ.items():
-    globals()[key] = value
+    globals()[key.lower()] = value
 
 # Image Folder
 image_folder = "https://github-projects-resume.s3.ap-south-1.amazonaws.com/Real_Time_Analytical_Dashboard/resources/"
@@ -193,7 +193,7 @@ def update_aqi_line_chart(time_interval):
     for trace in aqi_chart.data:
         trace.name = custom_names.get(trace.name, trace.name)
 
-    aqi_chart.update_layout(autosize=True, margin=dict(l=0, r=25, b=0), height=350)
+    aqi_chart.update_layout(autosize=True, margin=dict(l=0, r=25, b=0))
     aqi_chart.update_layout(title={"text": "<b>Air Quality Trend</b>", "x": 0.03, "y": 0.92, "yanchor": "top"}, title_font_color="#052F5F", title_font=dict(size=20, family="Poppins"))
     aqi_chart.update_layout(legend=dict(font=dict(color="#000000", size=14, family="Poppins"), orientation="h", x=0.99, y=1.15, xanchor="right", yanchor="top", title_text=""))
     aqi_chart.update_layout(xaxis_title="", yaxis_title="", legend_title_text="")

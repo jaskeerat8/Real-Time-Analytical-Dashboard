@@ -19,7 +19,7 @@ load_dotenv()
 # Credentials
 aws_region = "ap-south-1"
 for key, value in os.environ.items():
-    globals()[key] = value
+    globals()[key.lower()] = value
 
 # s3 Location
 s3_path = "s3://github-projects-resume/Real_Time_Analytical_Dashboard"
