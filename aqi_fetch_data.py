@@ -22,11 +22,11 @@ for key, value in os.environ.items():
     globals()[key] = value
 
 # s3 Location
+weather_api_key = "61a52d25f84241808d193256242006"
 s3_path = "s3://github-projects-resume/Real_Time_Analytical_Dashboard"
 raw_data_path = f"{s3_path}/data/raw"
 final_data_path = f"{s3_path}/data/final"
 pollutant_breakpoints = f"{s3_path}/resources/aqi_concentration_breakpoints.csv"
-
 
 # Molecular Weights
 molecular_weights = {"pm25": 0, "pm10": 0, "no2": 46.01, "so2": 64.07, "co": 28.01, "o3": 48.00}
@@ -36,7 +36,7 @@ def calculate_aqi(df, breakpoint_df):
     prominent_pollutant = ""
     for pollutant_key in df.columns:
 
-        pollutant_value = round(df[pollutant_key].iloc[0])
+        pollutant_value = df[pollutant_key].iloc[0]
         breakpoint_pollutant_df = breakpoint_df[breakpoint_df["pollutant"] == pollutant_key]
 
         if pollutant_value < breakpoint_pollutant_df["low_concentration"].min():
@@ -95,10 +95,10 @@ def get_aqi_in(breakpoint_df):
 
 def get_aqi_us():
     try_count = 0
-    while try_count < 5:
+    while try_count < 1:
         try:
             url = "https://www.aqi.in/in/dashboard/india/chandigarh"
-            response = requests.get(url)
+            response = requests.get(url, headers = {"User-Agent": "Mozilla/5.0"})
             html_content = response.text
             soup = BeautifulSoup(html_content, "html.parser")
 
@@ -109,7 +109,7 @@ def get_aqi_us():
                     aqi_us = int(aqi_us)
                     break
             return aqi_us
-        except:
+        except Exception as e:
             try_count = try_count + 1
             time.sleep(try_count * 60)
     return 0
@@ -150,21 +150,22 @@ def read_s3():
         secret=aws_secret_access_key,
         client_kwargs={'region_name': aws_region}
     )
-    all_files = fs.glob(f"{raw_data_path}/**/*.parquet")
 
-    valid_files = []
-    for file in all_files:
-        if fs.exists(file) and fs.info(file)['type'] == 'file' and file.endswith(".parquet"):
-            valid_files.append(file)
+    today = datetime.now()
+    paths = []
 
-    df = pd.concat([pd.read_parquet(file, filesystem=fs) for file in valid_files], ignore_index=True)
-    df = df.drop_duplicates(subset=["timestamp", "aqi_in", "pm2_5", "pm10", "so2", "co", "o3", "no2"], keep='last')
-    df["timestamp"] = pd.to_datetime(df["timestamp"], format="%d-%m-%Y %H:%M:%S")
+    for i in range(7):
+        d = today - timedelta(days=i)
+        date_str = d.strftime("%Y-%m-%d")
 
-    df = df[df["timestamp"] >= pd.Timestamp.now(tz="Asia/Kolkata") - pd.Timedelta(days=7)]
-    df.sort_values(["timestamp"], ascending=True, inplace=True)
-    df = df.reset_index(drop=True)
-    return df
+        path = f"{raw_data_path}/date={date_str}/*.parquet"
+        paths.extend(fs.glob(path))
+
+    df = pd.read_parquet(paths, filesystem=fs)
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+    df = df.drop_duplicates(subset=["timestamp"], keep='last')
+
+    return df.sort_values("timestamp").reset_index(drop=True)
 
 
 def final_to_s3(df):
