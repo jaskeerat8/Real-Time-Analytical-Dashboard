@@ -1,5 +1,5 @@
 # Importing Libraries
-import os, re, io
+import os, io, re, math
 import json, time
 import boto3
 import requests
@@ -34,9 +34,9 @@ molecular_weights = {"pm25": 0, "pm10": 0, "no2": 46.01, "so2": 64.07, "co": 28.
 def calculate_aqi(df, breakpoint_df):
     aqi_breakpoint = 0
     prominent_pollutant = ""
+    
     for pollutant_key in df.columns:
-
-        pollutant_value = df[pollutant_key].iloc[0]
+        pollutant_value = math.ceil(df[pollutant_key].iloc[0])
         breakpoint_pollutant_df = breakpoint_df[breakpoint_df["pollutant"] == pollutant_key]
 
         if pollutant_value < breakpoint_pollutant_df["low_concentration"].min():
