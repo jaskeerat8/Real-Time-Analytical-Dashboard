@@ -22,7 +22,6 @@ for key, value in os.environ.items():
     globals()[key] = value
 
 # s3 Location
-weather_api_key = "61a52d25f84241808d193256242006"
 s3_path = "s3://github-projects-resume/Real_Time_Analytical_Dashboard"
 raw_data_path = f"{s3_path}/data/raw"
 final_data_path = f"{s3_path}/data/final"
