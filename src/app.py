@@ -3,6 +3,7 @@ import os
 from io import StringIO, BytesIO
 import boto3
 import pandas as pd
+from datetime import timedelta
 import joblib
 import dash_daq as daq
 import plotly.express as px
@@ -187,7 +188,10 @@ app.layout = dmc.MantineProvider(
 )
 def update_aqi_line_chart(time_interval):
     df = get_data()
-    aqi_chart = px.line(df, x="timestamp", y=["aqi_in", "aqi_us"], template="plotly_white")
+
+    max_time = df["timestamp"].max()
+    min_time = max_time - timedelta(hours=48)
+    aqi_chart = px.line(df, x="timestamp", y=["aqi_in", "aqi_us"], template="plotly_white", range_x=[min_time, max_time])
 
     custom_names = {"aqi_in": "INDIA Standard   ", "aqi_us": "US Standard   "}
     for trace in aqi_chart.data:
@@ -195,7 +199,7 @@ def update_aqi_line_chart(time_interval):
 
     aqi_chart.update_layout(autosize=True, margin=dict(l=0, r=25, b=0))
     aqi_chart.update_layout(title={"text": "<b>Air Quality Trend</b>", "x": 0.03, "y": 0.92, "yanchor": "top"}, title_font_color="#052F5F", title_font=dict(size=20, family="Poppins"))
-    aqi_chart.update_layout(legend=dict(font=dict(color="#000000", size=14, family="Poppins"), orientation="h", x=0.99, y=1.15, xanchor="right", yanchor="top", title_text=""))
+    aqi_chart.update_layout(legend=dict(font=dict(color="#000000", size=14, family="Poppins"), orientation="h", x=1, y=1.3, xanchor="right", yanchor="top", title_text=""))
     aqi_chart.update_layout(xaxis_title="", yaxis_title="", legend_title_text="")
     aqi_chart.update_layout(yaxis_showgrid=True, yaxis_ticksuffix="  ", yaxis=dict(tickfont=dict(size=12, family="Poppins", color="black"), griddash="dash", gridwidth=1, gridcolor="#DADADA"))
     aqi_chart.update_layout(xaxis_showgrid=False, xaxis=dict(tickfont=dict(size=12, family="Poppins", color="#000000"), tickangle=0))
