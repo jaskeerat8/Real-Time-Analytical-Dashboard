@@ -90,7 +90,7 @@ app.layout = dmc.MantineProvider(
                         html.P(className="aqi_reading_subheader", children="(24 Hour Average)")
                     ]),
                     html.Div(className="aqi_reading", children=[
-                        html.P(className="aqi_reading_heading", children="Next ML Predicted AQI"),
+                        html.P(className="aqi_reading_heading", children="ML AQI Forecast"),
                         html.P(className="aqi_reading_count_predicted", id="aqi_reading_count_predicted"),
                         html.P(className="aqi_reading_subheader", children="(Per Hour)")
                     ])
